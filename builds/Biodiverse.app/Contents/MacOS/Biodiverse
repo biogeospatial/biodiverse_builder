@@ -16,4 +16,4 @@ mkdir -p "`dirname \"$LOG_FILE\"`"
 
 # Run the app and redirect standard 
 # output and error to the log file.
-exec $DIR/$APPNAME >> $LOG_FILE 2>&1
+exec "$DIR/$APPNAME" >> $LOG_FILE 2>&1
