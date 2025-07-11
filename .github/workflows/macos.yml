@@ -56,7 +56,7 @@ jobs:
           
         
       - name: Install Gtk etc
-        run: brew install gdk-pixbuf pango gtk+3 glib
+        run: brew install gdk-pixbuf pango gobject-introspection gtk+3 glib
       
 
       - name: Set up Perl
@@ -76,22 +76,6 @@ jobs:
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
-#      - name: Install libgnomecanvas
-#        run: |
-#          eval "$(brew shellenv)"
-#          #  libgnomecanvas needs this
-#          cpanm XML::Parser
-#          brew install libart intltool gettext
-#          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
-#          tar xf lgc.tar.bz
-#          cd libgnomecanvas-2.30.3
-#          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
-#          patch -d libgnomecanvas < libgnomecanvas.patch
-#          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
-#          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
-#          make
-#          make install
-
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
@@ -106,6 +90,8 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          which perl
+          which cpanm
           cpanm App::PP::Autolink
           which pp_autolink.pl
           which -a pp
@@ -119,18 +105,30 @@ jobs:
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk3
-#          cpanm --notest Gnome2::Canvas
-#          cpanm --notest Task::Biodiverse
+          cpanm --notest Glib::Object::Introspection
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
+          cpanm Browser::Start
+          #  these sometimes fail
+          cpanm -v XML::XPath XML::Twig XML::Twig::XPath
+          cpanm Spreadsheet::ReadSXC Spreadsheet::ParseODS Spreadsheet::ParseXLSX
+          cpanm -v --notest Spreadsheet::Read
+          cpanm -v --notest IO::Socket::SSL
+          cpanm -v autovivification
+          cpanm Data::Printer
+
 
       - name: Clone biodiverse repo
         run: | 
+          which perl
+          which cpanm
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
-          prove t/00-load.t
+          #prove t/00-load.t
+          #  run tests
+          prove -l
           cd -
         
       #- name: Check Biodiverse can run, except that it hangs
@@ -146,6 +144,7 @@ jobs:
           eval "$(brew shellenv)"
           export PATH=/Users/runner/perl5/bin:$PATH
           which -a pp
+          which perl
           echo $SHELL
           perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
