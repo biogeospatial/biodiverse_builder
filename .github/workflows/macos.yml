@@ -56,7 +56,7 @@ jobs:
           
         
       - name: Install Gtk etc
-        run: brew install gdk-pixbuf pango gtk+ gtk+3
+        run: brew install gdk-pixbuf pango gtk+3 glib
       
 
       - name: Set up Perl
@@ -76,21 +76,21 @@ jobs:
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
-      - name: Install libgnomecanvas 
-        run: |
-          eval "$(brew shellenv)"
-          #  libgnomecanvas needs this
-          cpanm XML::Parser 
-          brew install libart intltool gettext
-          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
-          tar xf lgc.tar.bz
-          cd libgnomecanvas-2.30.3
-          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
-          patch -d libgnomecanvas < libgnomecanvas.patch
-          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
-          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
-          make
-          make install
+#      - name: Install libgnomecanvas
+#        run: |
+#          eval "$(brew shellenv)"
+#          #  libgnomecanvas needs this
+#          cpanm XML::Parser
+#          brew install libart intltool gettext
+#          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
+#          tar xf lgc.tar.bz
+#          cd libgnomecanvas-2.30.3
+#          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
+#          patch -d libgnomecanvas < libgnomecanvas.patch
+#          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
+#          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
+#          make
+#          make install
 
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -118,9 +118,9 @@ jobs:
           #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
-          cpanm --notest Gtk2
-          cpanm --notest Gnome2::Canvas
-          cpanm --notest Task::Biodiverse
+          cpanm --notest Gtk3
+#          cpanm --notest Gnome2::Canvas
+#          cpanm --notest Task::Biodiverse
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
