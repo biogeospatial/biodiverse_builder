@@ -193,6 +193,7 @@ my @verbose_command = $verbose ? ("-v") : ();
 
 my $pp_autolink = `which pp_autolink.pl`;
 chomp $pp_autolink;
+die 'Cannot find pp_autolink.pl' if !$pp_autolink;
 my @pp_cmd = ($^X, $pp_autolink);
 my @cmd = (
     @pp_cmd,
