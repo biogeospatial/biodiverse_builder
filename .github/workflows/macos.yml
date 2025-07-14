@@ -154,7 +154,7 @@ jobs:
       
       - name: Uninstall brew deps
         run: |
-          brew uninstall gdk-pixbuf pango gtk+3 glib gdal
+          brew uninstall gdk-pixbuf gtk+3 gdal
       
       - name: Try to run the packed archive
         run: |
