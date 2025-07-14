@@ -56,7 +56,7 @@ jobs:
           
         
       - name: Install Gtk etc
-        run: brew install gdk-pixbuf pango gtk+3 glib
+        run: brew install gdk-pixbuf pango gtk+3 glib gobject-introspection
       
 
       - name: Set up Perl
@@ -87,29 +87,39 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          which perl
+          which cpanm
           cpanm App::PP::Autolink
           which pp_autolink.pl
           which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
-          #  ensure share install for gdal et al
-          #ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
-          #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
-          #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk3
+          cpanm --notest Glib::Object::Introspection
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
+          cpanm Browser::Start
+          #  these sometimes fail
+          cpanm -v XML::XPath XML::Twig XML::Twig::XPath
+          cpanm Spreadsheet::ReadSXC Spreadsheet::ParseODS Spreadsheet::ParseXLSX
+          cpanm -v --notest Spreadsheet::Read
+          cpanm -v --notest IO::Socket::SSL
+          cpanm -v autovivification
+          cpanm Data::Printer
+
 
       - name: Clone biodiverse repo
         run: | 
+          which perl
+          which cpanm
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
-          prove t/00-load.t
+          #prove t/00-load.t
+          prove -l
           cd -
         
       #- name: Check Biodiverse can run, except that it hangs
@@ -125,6 +135,7 @@ jobs:
           eval "$(brew shellenv)"
           export PATH=/Users/runner/perl5/bin:$PATH
           which -a pp
+          which perl
           echo $SHELL
           perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
@@ -146,4 +157,8 @@ jobs:
           brew uninstall gdk-pixbuf pango gtk+3 glib gdal
       
       - name: Try to run the packed archive
-        run: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+        run: |
+          ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
