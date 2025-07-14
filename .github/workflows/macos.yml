@@ -76,25 +76,6 @@ jobs:
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
-#      - name: Install libgnomecanvas
-#        run: |
-#          eval "$(brew shellenv)"
-#          #  libgnomecanvas needs this
-#          cpanm XML::Parser
-#          brew install libart intltool gettext
-#          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
-#          tar xf lgc.tar.bz
-#          cd libgnomecanvas-2.30.3
-#          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
-#          patch -d libgnomecanvas < libgnomecanvas.patch
-#          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
-#          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
-#          make
-#          make install
-
-      #- name: clear cache
-      #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
-
       - name: Cache CPAN modules
         uses: actions/cache@v4
         if: "!cancelled()"
@@ -119,8 +100,6 @@ jobs:
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk3
-#          cpanm --notest Gnome2::Canvas
-#          cpanm --notest Task::Biodiverse
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
@@ -161,3 +140,10 @@ jobs:
           name: dmg-file
           #path: ${DMG_FILE_NAME}
           path: ./builds/Biodiverse-*.dmg
+      
+      - name: Uninstall brew deps
+        run: |
+          brew uninstall gdk-pixbuf pango gtk+3 glib gdal
+      
+      - name: Try to run the packed archive
+        run: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
