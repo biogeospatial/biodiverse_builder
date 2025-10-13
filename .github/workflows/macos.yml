@@ -44,8 +44,9 @@ jobs:
           brew install pkgconfig
           brew install fileicon
 
-      - name: Install GDAL and its deps
-        run: brew install gdal
+      #  use aliens - issues with sqlite dylib clashes under brew
+      # - name: Install GDAL and its deps
+      #   run: brew install gdal
         
       #- name: Get lib names
       #  run: |
@@ -56,8 +57,7 @@ jobs:
           
         
       - name: Install Gtk etc
-        run: brew install gdk-pixbuf pango gtk+3 glib
-      
+        run: brew install gdk-pixbuf pango gtk+3 glib gobject-introspection
 
       - name: Set up Perl
         run: |
