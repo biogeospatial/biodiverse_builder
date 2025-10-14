@@ -44,17 +44,11 @@ jobs:
           brew install pkgconfig
           brew install fileicon
 
-      #  use aliens - issues with sqlite dylib clashes under brew
+      #  use alien instead of brew versions 
+      #  we get issues with sqlite dylib clashes under homebrew
       # - name: Install GDAL and its deps
       #   run: brew install gdal
         
-      #- name: Get lib names
-      #  run: |
-      #    find /usr/local/Cellar -name '*.dylib' -print
-      #    find /usr/local/Cellar -name 'libxml2*.dylib' -print
-      #    find /usr/local/Cellar -name '*lwgeom*.dylib' -print
-      #    find /usr/local/Cellar -name 'libsqlite3*.dylib' -print
-          
         
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+3 glib gobject-introspection
@@ -75,22 +69,6 @@ jobs:
           #  change the checksum so we refresh the cache
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
-
-#      - name: Install libgnomecanvas
-#        run: |
-#          eval "$(brew shellenv)"
-#          #  libgnomecanvas needs this
-#          cpanm XML::Parser
-#          brew install libart intltool gettext
-#          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
-#          tar xf lgc.tar.bz
-#          cd libgnomecanvas-2.30.3
-#          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
-#          patch -d libgnomecanvas < libgnomecanvas.patch
-#          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
-#          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
-#          make
-#          make install
 
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
