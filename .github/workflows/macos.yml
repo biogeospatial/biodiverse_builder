@@ -49,6 +49,11 @@ jobs:
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+3 glib gobject-introspection
 
+      - name: Gtk debug probes
+        run: |
+          find $HOMEBREW_PREFIX/lib -name libgtk-3.0.dylib
+          ls $HOMEBREW_PREFIX/lib/girepository-1.0
+
       - name: Set up Perl
         run: |
           brew install perl
