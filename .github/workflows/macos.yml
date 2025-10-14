@@ -18,7 +18,7 @@ env:
 jobs:
   perl:
 
-    runs-on: macOS-latest
+    runs-on: macOS-15-intel
 
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
-          echo 'with shared Alien installs' >> perlversion.txt
+          echo 'intel with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
