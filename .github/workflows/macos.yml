@@ -29,14 +29,10 @@ jobs:
           ls -l
           brew shellenv
           
-      - name: Probe /usr/lib etc
+      - name: Probe chip and homebrew
         run: |
-          echo /usr/local
-          ls /usr/local
-          echo /usr/lib/
-          ls /usr/lib/
-          echo /usr/lib/system
-          ls /usr/lib/system
+          uname -m   
+          echo $HOMEBREW_PREFIX
           
 
       - name: Install pkgconfig and fileicon
