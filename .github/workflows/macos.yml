@@ -148,7 +148,7 @@ jobs:
       
       - name: Try to run the packed archive
         run: |
-          ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
+          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
             echo "Binary failed to run!" >&2
             exit 0  #  don't cripple the caching by failing
           }
