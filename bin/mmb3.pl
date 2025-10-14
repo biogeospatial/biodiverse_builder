@@ -125,9 +125,9 @@ chomp $gtk3_dylib;
 # );
 # say STDERR $sqlite3_dylib;
 
-my @tmp_gdal_deps = map {s/\s\(.+$//r} map {s/^\s+//r} grep {/sqlite3/} `otool -L $ENV{HOMEBREW_PREFIX}/lib/libgdal.dylib`;
-my $sqlite3_dylib = shift @tmp_gdal_deps;
-chomp $sqlite3_dylib;
+#my @tmp_gdal_deps = map {s/\s\(.+$//r} map {s/^\s+//r} grep {/sqlite3/} `otool -L $ENV{HOMEBREW_PREFIX}/lib/libgdal.dylib`;
+#my $sqlite3_dylib = shift @tmp_gdal_deps;
+#chomp $sqlite3_dylib;
 # use DDP; p $sqlite3_dylib;
 # exit;
 
