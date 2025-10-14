@@ -101,6 +101,8 @@ jobs:
           cpanm --notest HTTP::Tiny
           cpanm --notest IO::Socket::SSL
           cpanm --notest LWP::Simple
+          cpanm --notest Geo::ShapeFile
+          cpanm --notest autovivification
 
       - name: Clone biodiverse repo
         run: | 
