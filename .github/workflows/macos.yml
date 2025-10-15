@@ -102,8 +102,8 @@ jobs:
           echo HHH
           cpanm --notest Alien::patch
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
