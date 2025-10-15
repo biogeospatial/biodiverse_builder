@@ -85,6 +85,7 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          cpanm Getopt::Long
           #cpanm App::PP::Autolink
           cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
           which pp_autolink.pl
