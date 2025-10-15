@@ -85,7 +85,7 @@ jobs:
 
       - name: Install cpan deps 
         run: |
-          cpanm Getopt::Long
+          #cpanm Getopt::Long
           #cpanm App::PP::Autolink
           cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
           which pp_autolink.pl
@@ -111,6 +111,11 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
+          
+      - name: GDAL dylibs
+        run: |
+          which perl
+          otool -L `perl -MAlien::GDAL -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
 
       - name: Clone biodiverse repo
         run: | 
