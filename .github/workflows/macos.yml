@@ -176,11 +176,11 @@ jobs:
         run: |
           brew uninstall gdk-pixbuf gtk+3
 
-#  Re-enable for debugging as it does not exit immediately      
-#      - name: Try to run the packed archive
-#        run: |
-#          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
-#            echo "Binary failed to run!" >&2
-#            exit 0  #  don't cripple the caching by failing
-#          }
+
+      - name: Try to run the packed archive
+        run: |
+          BDV_PP_BUILDING=1 BD_NO_GUI_DEV_WARN=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
           
