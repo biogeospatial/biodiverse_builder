@@ -40,10 +40,10 @@ jobs:
           brew install pkgconfig
           brew install fileicon
 
-      #  use alien instead of brew versions 
-      #  we get issues with sqlite dylib clashes under homebrew
-      # - name: Install GDAL and its deps
-      #   run: brew install gdal
+      #  we use a shared alien for gdal and proj but this gets us the deps 
+      #  otherwise we get issues with sqlite dylib clashes under homebrew
+      - name: Install GDAL and its deps
+        run: brew install gdal
         
         
       - name: Install Gtk etc
@@ -68,7 +68,7 @@ jobs:
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
-          echo 'intel with shared Alien installs' >> perlversion.txt
+          echo 'intel with mostly shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
@@ -92,6 +92,7 @@ jobs:
           which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
+          cpanm --notest Alien::libtiff  #  sys install for this one
           #  ensure share install for gdal et al
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
           ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
