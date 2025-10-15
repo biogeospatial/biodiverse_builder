@@ -95,9 +95,15 @@ jobs:
           cpanm --notest Alien::MSYS
           cpanm --notest Alien::libtiff  #  sys install for this one
           #  ensure share install for gdal et al
+          echo HHH
+          echo $HOMEBREW_PREFIX
+          export HOMEBREW_PREFIX=`brew --prefix`
+          echo $HOMEBREW_PREFIX
+          echo HHH
+          cpanm --notest Alien::patch
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
-          #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
@@ -118,14 +124,15 @@ jobs:
         run: |
           which perl
           otool -L `perl -MAlien::GDAL -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
-      - name: GDAL probe
-        run: |
-          perl etc/probe_gdal.pl
-          pp_autolink -o probe_gdal etc/probe_gdal
-          ./probe_gdal || {
-            echo "Binary failed to run!" >&2
-            exit 0  #  don't cripple the caching by failing
-          }
+          
+      # - name: GDAL probe
+        # run: |
+          # perl etc/probe_gdal.pl
+          # pp_autolink -o probe_gdal etc/probe_gdal
+          # ./probe_gdal || {
+            # echo "Binary failed to run!" >&2
+            # exit 0  #  don't cripple the caching by failing
+          # }
 
       - name: Clone biodiverse repo
         run: | 

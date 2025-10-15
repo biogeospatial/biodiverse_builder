@@ -7,7 +7,7 @@ eval 'use Geo::GDAL::FFI';
 warn $@ if $@;
 
 
-my @libs = grep {/$libgdal.+.dylib$/} Alien::gdal->dynamic_libs;
+my @libs = grep {/libgdal.+.dylib$/} Alien::gdal->dynamic_libs;
 my $libgdal = shift @libs;
 
 my @res = `otool -L $libgdal`
