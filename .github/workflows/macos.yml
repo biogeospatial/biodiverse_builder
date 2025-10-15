@@ -85,7 +85,8 @@ jobs:
 
       - name: Install cpan deps 
         run: |
-          cpanm App::PP::Autolink
+          #cpanm App::PP::Autolink
+          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
           which pp_autolink.pl
           which -a pp
           #  no share install for Alien::MSYS
@@ -116,7 +117,7 @@ jobs:
           cd biodiverse
           cpanm --installdeps .
           #prove t/00-load.t
-          prove -l t
+          prove -j4 -l t
           cd -
         
       #- name: Check Biodiverse can run, except that it hangs
