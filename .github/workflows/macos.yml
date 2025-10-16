@@ -164,6 +164,15 @@ jobs:
           #path: ${DMG_FILE_NAME}
           path: ./builds/Biodiverse-*.dmg
 
+      - name: GDAL probe 1
+        run: |
+          perl etc/probe_gdal.pl
+          pp_autolink -o probe_gdal etc/probe_gdal.pl
+          ./probe_gdal || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
+
       - name: Uninstall brew deps
         run: |
           brew uninstall gdk-pixbuf gtk+3 gdal
@@ -177,10 +186,8 @@ jobs:
           }
           
           
-      - name: GDAL probe
+      - name: GDAL probe 2
         run: |
-          perl etc/probe_gdal.pl
-          pp_autolink -o probe_gdal etc/probe_gdal.pl
           ./probe_gdal || {
             echo "Binary failed to run!" >&2
             exit 0  #  don't cripple the caching by failing
