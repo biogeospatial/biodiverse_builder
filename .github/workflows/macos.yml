@@ -119,7 +119,8 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
-          cpanm --reinstall Geo::GDAL::FFI
+          otool -L `perl -MAlien::gdal -E'my @libs = grep {/libgdal.+.dylib$/} Alien::gdal->dynamic_libs; print shift @libs;'`
+          cpanm --reinstall --verbose Geo::GDAL::FFI
           
       - name: GDAL dylibs
         run: |
