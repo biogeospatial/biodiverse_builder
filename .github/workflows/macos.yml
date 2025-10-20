@@ -119,6 +119,7 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
+          cpanm --reinstall Geo::GDAL::FFI
           
       - name: GDAL dylibs
         run: |
