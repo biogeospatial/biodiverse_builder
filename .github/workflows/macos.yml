@@ -86,6 +86,8 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          #  ensure share install when needed
+          eval "$(brew shellenv)"
           #cpanm Getopt::Long
           #cpanm App::PP::Autolink
           cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
@@ -94,12 +96,6 @@ jobs:
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           cpanm --notest Alien::libtiff  #  sys install for this one
-          #  ensure share install for gdal et al
-          echo HHH
-          echo $HOMEBREW_PREFIX
-          export HOMEBREW_PREFIX=`brew --prefix`
-          echo $HOMEBREW_PREFIX
-          echo HHH
           cpanm --notest Alien::patch
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
           ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
@@ -119,7 +115,7 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
-          otool -L `perl -MAlien::gdal -E'my @libs = grep {/libgdal.+.dylib$/} Alien::gdal->dynamic_libs; print shift @libs;'`
+          otool -L `perl -MAlien::GDAL -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
           cpanm --reinstall --verbose Geo::GDAL::FFI
           
       - name: GDAL dylibs
