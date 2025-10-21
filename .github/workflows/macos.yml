@@ -143,6 +143,13 @@ jobs:
           #prove -j4 -l t
           cd -
         
+      - name: Upload cpanm dir
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm_dir
+          #path: ${DMG_FILE_NAME}
+          path: ~/.cpanm
+
       #- name: Check Biodiverse can run, except that it hangs
       #  run: prove -l biodiverse/t
       
