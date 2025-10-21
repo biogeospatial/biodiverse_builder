@@ -46,7 +46,7 @@ jobs:
       - name: Install GDAL and its deps
         run: |
           brew install gdal boost
-          #brew uninstall --ignore-dependencies poppler
+          brew uninstall --ignore-dependencies poppler
         
         
       - name: Install Gtk etc
