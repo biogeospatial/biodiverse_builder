@@ -115,13 +115,14 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
-          otool -L `perl -MAlien::GDAL -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          otool -L `perl -MAlien::proj -E'print Alien::proj->dist_dir'`/lib/libproj.dylib
+          otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
           cpanm --reinstall --verbose Geo::GDAL::FFI
           
       - name: GDAL dylibs
         run: |
           which perl
-          otool -L `perl -MAlien::GDAL -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
           
 
       - name: Clone biodiverse repo
