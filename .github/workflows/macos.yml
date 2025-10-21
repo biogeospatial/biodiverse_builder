@@ -42,9 +42,11 @@ jobs:
 
       #  we use a shared alien for gdal and proj but this gets us the deps 
       #  otherwise we get issues with sqlite dylib clashes under homebrew
-      #  We need boost or the build fails
+      #  no poppler due to https://github.com/osgeo/gdal/issues/13173
       - name: Install GDAL and its deps
-        run: brew install gdal boost
+        run: |
+          brew install gdal boost
+          brew uninstall --ignore-dependencies poppler
         
         
       - name: Install Gtk etc
