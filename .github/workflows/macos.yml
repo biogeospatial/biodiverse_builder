@@ -144,10 +144,10 @@ jobs:
           cd -
         
       - name: Upload cpanm dir
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
-          #path: ${DMG_FILE_NAME}
           path: ~/.cpanm
 
       #- name: Check Biodiverse can run, except that it hangs
