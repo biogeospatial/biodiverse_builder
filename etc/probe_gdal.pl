@@ -2,6 +2,7 @@ use 5.036;
 use warnings;
 
 use Alien::gdal;
+use Alien::proj;
 
 eval 'use Geo::GDAL::FFI';
 if (my $e = $@) {
@@ -18,3 +19,9 @@ my $libgdal = shift @libs;
 my @res = `otool -L $libgdal`;
 say "otool -L $libgdal";
 say join "\n", @res;
+
+my @proj_libs = grep {/libproj.+.dylib$/} Alien::proj->dynamic_libs;
+my $libproj = shift @proj_libs;
+
+say "otool -L $libproj";
+say join "\n", `otool -L $libproj`;
