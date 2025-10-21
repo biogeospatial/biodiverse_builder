@@ -69,7 +69,7 @@ jobs:
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
-          echo 'intel with mostly shared Alien installs' >> perlversion.txt
+          echo 'intel with mostly shared Alien installs mk2' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
