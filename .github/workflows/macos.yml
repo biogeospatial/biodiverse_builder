@@ -124,6 +124,7 @@ jobs:
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm --reinstall --verbose Geo::GDAL::FFI || {
             echo "Geo::GDAL::FFI failed its tests" >&2
+            cat $HOME/.cpanm/latest-build/build.log
             exit 0  #  don't cripple the caching by failing
           }
           
@@ -137,8 +138,8 @@ jobs:
         run: | 
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
-          cpanm --installdeps .
-          prove t/00-load.t || {exit 0}
+          cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
+          prove t/00-load.t || true  #  allow caching even if we fail
           #prove -j4 -l t
           cd -
         
