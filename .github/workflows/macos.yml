@@ -208,3 +208,9 @@ jobs:
             echo "Binary failed to run!" >&2
             exit 0  #  don't cripple the caching by failing
           }
+
+      - name: Upload gdal probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdal_probe
+          path: ./probe_gdal
