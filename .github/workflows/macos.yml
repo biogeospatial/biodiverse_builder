@@ -29,10 +29,11 @@ jobs:
           ls -l
           brew shellenv
           
-      - name: Probe chip and homebrew
+      - name: Probe chip, homebrew etc
         run: |
           uname -m   
           echo $HOMEBREW_PREFIX
+          ls /usr/lib/*.dylib
           
 
       - name: Install pkgconfig and fileicon
