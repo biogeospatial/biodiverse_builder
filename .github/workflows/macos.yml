@@ -99,7 +99,7 @@ jobs:
           cpanm --notest Alien::MSYS
           cpanm --notest Alien::libtiff  #  sys install for this one
           cpanm --notest Alien::patch
-          cpanm --notest Alien::sqlite
+          # cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
           #  no poppler due to https://github.com/osgeo/gdal/issues/13173
           export ALIEN_GDAL_CONFIG_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF"
