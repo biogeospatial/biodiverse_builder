@@ -25,3 +25,25 @@ my $libproj = shift @proj_libs;
 
 say "otool -L $libproj";
 say join "\n", `otool -L $libproj`;
+
+
+say 'rpath vals:';
+
+dump_rpath($libgdal);
+dump_rpath($libproj);
+
+
+sub dump_rpath{
+    my ($source) = @_;
+
+    my @results = qx /otool -l $source/;
+    while (my $line = shift @results) {
+        last if $line =~ /LC_RPATH/;
+    }
+    my @lc_rpath_chunk;
+    while (my $line = shift @results) {
+        last if $line =~ /LC_/;  #  any other command
+        push @lc_rpath_chunk, $line;
+    }
+    print @lc_rpath_chunk;
+}
