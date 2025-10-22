@@ -46,7 +46,7 @@ jobs:
       #  no poppler due to https://github.com/osgeo/gdal/issues/13173 - handle as an arg when new Alien::gdal released
       - name: Install GDAL and its deps
         run: |
-          brew install gdal boost
+          brew install gdal boost curl expat zlib libxml2 libiconv
           brew uninstall --ignore-dependencies poppler
         
         
@@ -72,7 +72,7 @@ jobs:
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
-          echo 'intel with mostly shared Alien installs mk2' >> perlversion.txt
+          echo 'intel with mostly shared Alien installs mk3' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
