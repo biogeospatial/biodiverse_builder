@@ -198,12 +198,14 @@ jobs:
         run: |
           brew uninstall --ignore-dependencies gdk-pixbuf gtk+3 
           # brew uninstall --ignore-dependencies gdal proj
+          mv perl5 perl5x
 
 
       - name: Try to run the packed archive
         run: |
           BDV_PP_BUILDING=1 BD_NO_GUI_DEV_WARN=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
             echo "Binary failed to run!" >&2
+            [[ -d perl5x ]] && mv perl5x perl5  #  put it back for caching
             exit 0  #  don't cripple the caching by failing
           }
           
@@ -212,6 +214,7 @@ jobs:
         run: |
           ./probe_gdal || {
             echo "Binary failed to run!" >&2
+            [[ -d perl5x ]] && mv perl5x perl5  #  put it back for caching
             exit 0  #  don't cripple the caching by failing
           }
 
@@ -220,3 +223,4 @@ jobs:
         with:
           name: gdal_probe
           path: ./probe_gdal
+          
