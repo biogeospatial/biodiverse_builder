@@ -203,7 +203,8 @@ jobs:
 
       - name: Move ~/perl5 out of the way
         run: |
-          mv perl5 perl5x
+          [[ -d ~/perl5 ]] && mv ~/perl5 ~/perl5x
+          ls ~
 
       - name: Try to run the packed archive
         run: |
@@ -228,4 +229,5 @@ jobs:
       - name: Reinstate ~/perl5 for caching
         if: "!cancelled()"
         run: |
-          [[ -d perl5x ]] && mv perl5x perl5  
+          [[ -d ~/perl5x ]] && mv ~/perl5x ~/perl5
+          ls ~
