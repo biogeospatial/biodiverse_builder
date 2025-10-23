@@ -158,7 +158,7 @@ jobs:
       - name: GDAL probe 1
         run: |
           perl etc/probe_gdal.pl
-          sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
+          export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
           pp_autolink --link ${sqlite_dylib} -o probe_gdal etc/probe_gdal.pl
           ./probe_gdal || {
             echo "Binary failed to run!" >&2
@@ -180,9 +180,9 @@ jobs:
           export PATH=/Users/runner/perl5/bin:$PATH
           which -a pp
           echo $SHELL
-          sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
+          export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
           echo Packing sqlite from ${sqlite_dylib}
-          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl --link ${sqlite_dylib}
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
         
       - name: Find dmg file
         run: |
@@ -194,30 +194,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dmg-file
-          #path: ${DMG_FILE_NAME}
           path: ./builds/Biodiverse-*.dmg
 
       - name: Uninstall brew deps
         run: |
           brew uninstall --ignore-dependencies gdk-pixbuf gtk+3 
           # brew uninstall --ignore-dependencies gdal proj
-          mv perl5 perl5x
 
+      - name: Move ~/perl5 out of the way
+        run: |
+          mv perl5 perl5x
 
       - name: Try to run the packed archive
         run: |
           BDV_PP_BUILDING=1 BD_NO_GUI_DEV_WARN=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
             echo "Binary failed to run!" >&2
-            [[ -d perl5x ]] && mv perl5x perl5  #  put it back for caching
             exit 0  #  don't cripple the caching by failing
           }
-          
           
       - name: GDAL probe 2
         run: |
           ./probe_gdal || {
             echo "Binary failed to run!" >&2
-            [[ -d perl5x ]] && mv perl5x perl5  #  put it back for caching
             exit 0  #  don't cripple the caching by failing
           }
 
@@ -227,3 +225,7 @@ jobs:
           name: gdal_probe
           path: ./probe_gdal
           
+      - name: Reinstate ~/perl5 for caching
+        if: "!cancelled()"
+        run: |
+          [[ -d perl5x ]] && mv perl5x perl5  
