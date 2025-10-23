@@ -46,9 +46,10 @@ jobs:
       #  no poppler due to https://github.com/osgeo/gdal/issues/13173 - handle as an arg when new Alien::gdal released
       - name: Install GDAL and its deps
         run: |
-          brew install gdal boost
+          # brew install gdal boost
           # brew install curl expat zlib libxml2 libiconv
           # brew uninstall --ignore-dependencies poppler
+          echo No brew extras
         
         
       - name: Install Gtk etc
@@ -104,8 +105,8 @@ jobs:
           # cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
           #  no poppler due to https://github.com/osgeo/gdal/issues/13173
-          export ALIEN_GDAL_CONFIG_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF"
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal@1.43
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF"
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
@@ -195,7 +196,8 @@ jobs:
 
       - name: Uninstall brew deps
         run: |
-          brew uninstall --ignore-dependencies gdk-pixbuf gtk+3 gdal proj
+          brew uninstall --ignore-dependencies gdk-pixbuf gtk+3 
+          # brew uninstall --ignore-dependencies gdal proj
 
 
       - name: Try to run the packed archive
