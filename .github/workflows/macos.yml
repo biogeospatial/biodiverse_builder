@@ -105,7 +105,7 @@ jobs:
           # cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
           #  no poppler due to https://github.com/osgeo/gdal/issues/13173
-          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF"
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
           ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           #cpanm --notest Task::Biodiverse::NoGUI
