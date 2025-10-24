@@ -110,7 +110,31 @@ $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 $ENV{BD_NO_GUI_DEV_WARN} = 1;
 
 
+#  gtk3 is not detected by the pp_autolink scan so
+#  hard code until then
+#  first one won't be in the cellar
+my @tmpgtk3 = `find $ENV{HOMEBREW_PREFIX}/lib -name libgtk-3.0.dylib`;
+my $gtk3_dylib = shift @tmpgtk3;
+chomp $gtk3_dylib;
+
+#  homebrew gdal depends on the homebrew sqlite, but proj uses the system sqlite.
+#  pp_autolink finds the system sqlite so does not pack it, so pack the homebrew version
+# use FFI::CheckLib;
+# my $sqlite3_dylib = find_lib_or_die(
+#     lib => 'libsqlite3'
+# );
+# say STDERR $sqlite3_dylib;
+
+#my @tmp_gdal_deps = map {s/\s\(.+$//r} map {s/^\s+//r} grep {/sqlite3/} `otool -L $ENV{HOMEBREW_PREFIX}/lib/libgdal.dylib`;
+#my $sqlite3_dylib = shift @tmp_gdal_deps;
+#chomp $sqlite3_dylib;
+# use DDP; p $sqlite3_dylib;
+# exit;
+
+
 my @hard_coded_dylibs = (
+    $gtk3_dylib,
+    # $sqlite3_dylib,
     #  hard code for now
     # '/usr/local/Cellar/openssl/1.0.2p/lib/libssl.1.0.0.dylib',
     # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libssl.1.1.dylib"',
@@ -120,6 +144,7 @@ my @hard_coded_dylibs = (
     #'$ENV{HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_5/lib/libgnomecanvas-2.0.dylib',
 );
 
+@hard_coded_dylibs = map {; '--link' => $_} @hard_coded_dylibs;
 
 
 
@@ -149,7 +174,7 @@ for my $dir (@mime_dirs) {
 say "\n-----\n";
 
 # Add the hicolor directory
-my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
+# my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
 
 my @xxx;
 push @xxx, ('-a', "$pixbuf_query_loader\;" . path ($pixbuf_query_loader)->basename);
@@ -158,10 +183,22 @@ foreach my $dir ($pixbuf_loaders, $gdk_pixbuf_dir) {
     my $basename = path ($dir)->basename;
     push @xxx, ('-a', "$path\;$basename");
 }
-push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+my $girepo = path ($ENV{HOMEBREW_PREFIX}, 'lib', 'girepository-1.0');
+push @xxx, ('-a', "$girepo\;girepository-1.0");
+my $gdbus = `which gdbus`;
+chomp $gdbus;
+push @xxx, ('-a', "$gdbus\;" . path ($gdbus)->basename);
+
+#  might not be needed now it is in the share dirs
+# push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+my @share_dirs;
+foreach my $dir (qw /gtk-3.0 gir-1.0 glib-2.0 icons themes/) {
+    my $path = path ($ENV{HOMEBREW_PREFIX}, 'share', $dir);
+    push @share_dirs, ("-a", "$path\;share/$dir");
+}
 
 #  clunky, but previous approach was sneaking a 1 into the array
-@add_files = (@add_files, @xxx);
+@add_files = (@add_files, @xxx, @share_dirs);
 
 say join ' ', @add_files;
 say "-----\n";
@@ -178,6 +215,7 @@ if ($script =~ 'BiodiverseGUI.pl') {
 
 my $output_binary_fullpath = path ($out_folder, $output_binary)->absolute;
 
+#  the biodiverse icon
 my $icon_file_base = $icon_file ? basename ($icon_file) : '';
 my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 
@@ -205,6 +243,7 @@ my @cmd = (
     @ui_arg,
     @icon_file_arg,
     $execute,
+    @hard_coded_dylibs,
     # @inc_to_pack,
     @add_files,
     @rest_of_pp_args,

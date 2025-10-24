@@ -29,14 +29,11 @@ jobs:
           ls -l
           brew shellenv
           
-      - name: Probe /usr/lib etc
+      - name: Probe chip, homebrew etc
         run: |
-          echo /usr/local
-          ls /usr/local
-          echo /usr/lib/
-          ls /usr/lib/
-          echo /usr/lib/system
-          ls /usr/lib/system
+          uname -m   
+          echo $HOMEBREW_PREFIX
+          ls /usr/lib/*.dylib
           
 
       - name: Install pkgconfig and fileicon
@@ -44,14 +41,24 @@ jobs:
           brew install pkgconfig
           brew install fileicon
 
-      #  use alien instead of brew versions 
-      #  we get issues with sqlite dylib clashes under homebrew
-      # - name: Install GDAL and its deps
-      #   run: brew install gdal
+      #  we use a shared alien for gdal and proj but this gets us the deps 
+      #  otherwise we get issues with sqlite dylib clashes under homebrew
+      #  no poppler due to https://github.com/osgeo/gdal/issues/13173 - handle as an arg when new Alien::gdal released
+      - name: Install GDAL and its deps
+        run: |
+          # brew install gdal boost
+          # brew install curl expat zlib libxml2 libiconv
+          # brew uninstall --ignore-dependencies poppler
+          echo No brew extras
         
         
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+3 glib gobject-introspection
+
+      # - name: Gtk debug probes
+      #   run: |
+      #     find $HOMEBREW_PREFIX/lib -name libgtk-3.0.dylib
+      #     ls $HOMEBREW_PREFIX/lib/girepository-1.0
 
       - name: Set up Perl
         run: |
@@ -67,7 +74,7 @@ jobs:
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
-          echo 'intel with shared Alien installs' >> perlversion.txt
+          echo 'intel with mostly shared Alien installs mk3' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
@@ -84,18 +91,27 @@ jobs:
 
       - name: Install cpan deps 
         run: |
-          cpanm App::PP::Autolink
+          #  ensure share install when needed
+          eval "$(brew shellenv)"
+          #cpanm Getopt::Long
+          #cpanm App::PP::Autolink
+          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
           which pp_autolink.pl
           which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
-          #  ensure share install for gdal et al
+          cpanm --notest Alien::libtiff  #  sys install for this one
+          cpanm --notest Alien::patch
+          # cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          #  no poppler due to https://github.com/osgeo/gdal/issues/13173
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
           ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
+          cpanm --notest Glib::Object::Introspection
           cpanm --notest Gtk3
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
@@ -105,15 +121,51 @@ jobs:
           cpanm --notest HTTP::Tiny
           cpanm --notest IO::Socket::SSL
           cpanm --notest LWP::Simple
+          cpanm --notest Geo::ShapeFile
+          cpanm --notest autovivification
+          otool -L `perl -MAlien::proj -E'print Alien::proj->dist_dir'`/lib/libproj.dylib
+          otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm --reinstall --verbose Geo::GDAL::FFI || {
+            echo "Geo::GDAL::FFI failed its tests" >&2
+            cat $HOME/.cpanm/latest-build/build.log
+            exit 0  #  don't cripple the caching by failing
+          }
+          
+      - name: GDAL dylibs
+        run: |
+          which perl
+          otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          
 
       - name: Clone biodiverse repo
         run: | 
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
-          cpanm --installdeps .
-          prove t/00-load.t
+          cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
+          prove t/00-load.t || true  #  allow caching even if we fail
+          #prove -j4 -l t
           cd -
         
+      - name: Upload cpanm dir
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm_dir
+          path: ~/.cpanm
+          
+          
+      - name: GDAL probe 1
+        run: |
+          perl etc/probe_gdal.pl
+          export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
+          pp_autolink --link ${sqlite_dylib} -o probe_gdal etc/probe_gdal.pl
+          ./probe_gdal || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
+
+
       #- name: Check Biodiverse can run, except that it hangs
       #  run: prove -l biodiverse/t
       
@@ -128,7 +180,9 @@ jobs:
           export PATH=/Users/runner/perl5/bin:$PATH
           which -a pp
           echo $SHELL
-          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+          export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
+          echo Packing sqlite from ${sqlite_dylib}
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
         
       - name: Find dmg file
         run: |
@@ -140,5 +194,40 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dmg-file
-          #path: ${DMG_FILE_NAME}
           path: ./builds/Biodiverse-*.dmg
+
+      - name: Uninstall brew deps
+        run: |
+          brew uninstall --ignore-dependencies gdk-pixbuf gtk+3 
+          # brew uninstall --ignore-dependencies gdal proj
+
+      - name: Move ~/perl5 out of the way
+        run: |
+          [[ -d ~/perl5 ]] && mv ~/perl5 ~/perl5x
+          ls ~
+
+      - name: Try to run the packed archive
+        run: |
+          BDV_PP_BUILDING=1 BD_NO_GUI_DEV_WARN=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
+          
+      - name: GDAL probe 2
+        run: |
+          ./probe_gdal || {
+            echo "Binary failed to run!" >&2
+            exit 0  #  don't cripple the caching by failing
+          }
+
+      - name: Upload gdal probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdal_probe
+          path: ./probe_gdal
+          
+      - name: Reinstate ~/perl5 for caching
+        if: "!cancelled()"
+        run: |
+          [[ -d ~/perl5x ]] && mv ~/perl5x ~/perl5
+          ls ~
