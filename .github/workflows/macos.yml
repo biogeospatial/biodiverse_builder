@@ -18,7 +18,11 @@ env:
 jobs:
   perl:
 
-    runs-on: macOS-15-intel
+    strategy:
+      matrix:
+        os: [macOS-15-intel, macOS-15]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -193,7 +197,7 @@ jobs:
       - name: Upload artefact
         uses: actions/upload-artifact@v4
         with:
-          name: dmg-file
+          name: dmg-file-${{ matrix.os }}
           path: ./builds/Biodiverse-*.dmg
 
       - name: Uninstall brew deps
@@ -223,7 +227,7 @@ jobs:
       - name: Upload gdal probe
         uses: actions/upload-artifact@v4
         with:
-          name: gdal_probe
+          name: gdal_probe-${{ matrix.os }}
           path: ./probe_gdal
           
       - name: Reinstate ~/perl5 for caching
