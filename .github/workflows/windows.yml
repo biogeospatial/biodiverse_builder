@@ -16,7 +16,7 @@ env:
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runners/.cpanm
   SP_VERSION: 5.38.4.1
-  ST: C:/Strawberry538
+  ST: C:\Strawberry538
 
 jobs:
   perl:
@@ -47,19 +47,23 @@ jobs:
           
       - name: Install Strawberry perl
         run: |
-          Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53841_64bit/strawberry-perl-5.38.4.1-64bit-PDL.zip" -OutFile "sp.zip" 
+          Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53841_64bit/strawberry-perl-5.38.4.1-64bit-PDL.zip" -OutFile ".\sp.zip" 
           Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
-          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
+          ls "$env:ST"
+          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> "$GITHUB_PATH"
+
+      - name: perl -V
+        run: |
           perl -V
 
-      # - name: perl -V
-        # run: perl -V
-
       - name: Prepare for cache
+        shell: cmd
         run: |
+          %ST%\portableshell.bat /SETENV
+          path
           perl -V > perlversion.txt
-          #  change the checksum so we refresh the cache
-          echo 'mostly shared Alien installs' >> perlversion.txt
+          ::  change the checksum so we refresh the cache
+          :: echo 'mostly shared Alien installs' >> perlversion.txt
 
       - name: Cache CPAN modules
         uses: actions/cache@v4
@@ -73,6 +77,7 @@ jobs:
       - name: Install cpan deps 
         shell: cmd
         run: |
+          %ST%\perl\portableshell.bat /SETENV
           path
           set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
@@ -113,17 +118,19 @@ jobs:
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm --reinstall --verbose Geo::GDAL::FFI || {
             :: echo "Geo::GDAL::FFI failed its tests" >&2
-            type $HOME/.cpanm/latest-build/build.log
+            echo $HOME/.cpanm/latest-build/build.log
             exit 0  #  don't cripple the caching by failing
           }
           
 
       - name: Clone biodiverse repo
-        run: | 
+        shell: cmd
+        run: |
+          %ST%\perl\portableshell.bat /SETENV
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
-          #prove t/00-load.t || true  #  allow caching even if we fail
+          :: prove t/00-load.t || true  #  allow caching even if we fail
           prove -j4 -l t
           cd ..
         
@@ -134,8 +141,10 @@ jobs:
           name: cpanm_dir
           path: /Users/runners/.cpanm
           
-      - name: Buid exe
+      - name: Build exe
+        shell: cmd
         run: |
+          %ST%\perl\portableshell.bat /SETENV
           perl etc\pp\build_autolink -s bin\BiodiverseGUI.pl -o . 
         
       - name: Upload artefact
