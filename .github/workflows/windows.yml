@@ -1,0 +1,129 @@
+name: windows
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /Users/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
+  PERL_MB_OPT: --install_base /Users/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+  PERL_CPANM_OPT: -M https://www.cpan.org
+  PERL_CPANM_HOME: /Users/runners/.cpanm
+
+jobs:
+  perl:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # - name: Probe wd
+        # run: |
+          # pwd
+          # ls -l
+
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5.38"
+          distribution: strawberry
+
+      # - name: perl -V
+        # run: perl -V
+
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          #  change the checksum so we refresh the cache
+          echo 'mostly shared Alien installs' >> perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v4
+        if: "!cancelled()"
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install cpan deps 
+        run: |
+          set PERL_CPANM_HOME=/Users/runners/.cpanm
+          perl -v
+          cpanm File::ShareDir::Install
+          cpanm --notest PAR::Packer
+          cpanm App::PP::Autolink
+          where pp_autolink.pl
+          #  no share install for Alien::MSYS
+          cpanm --notest --verbose Alien::MSYS
+          cpanm --notest Alien::libtiff  #  sys install for this one
+          #cpanm --notest Alien::patch
+          cpanm --notest Alien::sqlite
+          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          #  simpler gdal deps
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          set ALIEN_INSTALL_TYPE=share 
+          cpanm --notest -v Alien::gdal
+          # ALIEN_INSTALL_TYPE=share 
+          # cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
+          cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
+          cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
+          ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/first_upload/
+          ppm install Cairo
+          ppm install Cairo-GObject
+          ppm install Glib
+          ppm install Gnome2-Canvas
+          ppm install Gtk2
+          ppm install Pango
+          cpanm --notest File::BaseDir
+          cpanm --notest File::Find::Rule
+          cpanm --notest Browser::Start
+          cpanm --notest ExtUtils::Depends
+          cpanm --notest HTTP::Tiny
+          cpanm --notest IO::Socket::SSL
+          cpanm --notest LWP::Simple
+          cpanm --notest Geo::ShapeFile
+          cpanm --notest autovivification
+          #otool -L `perl -MAlien::proj -E'print Alien::proj->dist_dir'`/lib/libproj.dylib
+          #otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm --reinstall --verbose Geo::GDAL::FFI || {
+            # echo "Geo::GDAL::FFI failed its tests" >&2
+            type $HOME/.cpanm/latest-build/build.log
+            exit 0  #  don't cripple the caching by failing
+          }
+          
+
+      - name: Clone biodiverse repo
+        run: | 
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
+          #prove t/00-load.t || true  #  allow caching even if we fail
+          prove -j4 -l t
+          cd ..
+        
+      - name: Upload cpanm dir
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm_dir
+          path: /Users/runners/.cpanm
+          
+      - name: Buid exe
+        run: |
+          perl etc\pp\build_autolink -s bin\BiodiverseGUI.pl -o . 
+        
+      - name: Upload artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_exe
+          path: ./biodiverseGUI*.exe
+
