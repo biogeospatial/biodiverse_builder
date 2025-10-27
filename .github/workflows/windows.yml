@@ -17,7 +17,7 @@ env:
   PERL_CPANM_HOME: /Users/runner/_cpanm
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
-  SP_PATHS: C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
+  SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
 
 jobs:
   perl:
@@ -186,8 +186,8 @@ jobs:
       - name: Build exe
         shell: cmd
         run: |
-          dir \Users\runner\perl5\bin
-          set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
+          :: set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
+          set PATH=%SP_PATHS%;%PATH%
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
         
