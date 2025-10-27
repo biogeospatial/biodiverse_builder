@@ -190,10 +190,12 @@ jobs:
           set PATH=%SP_PATHS%;%PATH%
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
+          cd ..
+          dir *.exe
         
       - name: Upload artefact
         uses: actions/upload-artifact@v4
         with:
           name: windows_exe
-          path: ./BiodiverseGUI*.exe
+          path: ./Biodiverse*.exe
 
