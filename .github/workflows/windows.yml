@@ -15,6 +15,8 @@ env:
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runners/.cpanm
+  SP_VERSION: 5.38.4.1
+  ST: C:/Strawberry538
 
 jobs:
   perl:
@@ -29,14 +31,29 @@ jobs:
           # pwd
           # ls -l
 
-      - uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: "5.38"
-          distribution: strawberry
+      # - uses: shogo82148/actions-setup-perl@v1
+        # with:
+          # perl-version: "5.38"
+          # distribution: strawberry
+
+      # - name: Install Strawberry perl
+        # shell: cmd
+        # run: |
+          # :: if exist %ST% del /Q %ST%
+          # if not exist %ST% choco install strawberryperl --force --allow-downgrade --version %SP_VERSION% --install-arguments="INSTALLDIR=""C:\Strawberry538"""
+          # refreshenv
+          # echo %ST%\perl\bin;%ST%\perl\site\bin;%ST%\c\bin >> $GITHUB_PATH
+          # path
+          
+      - name: Install Strawberry perl
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53841_64bit/strawberry-perl-5.38.4.1-64bit-PDL.zip" -OutFile "sp.zip" 
+          Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
+          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
+          perl -V
 
       # - name: perl -V
         # run: perl -V
-
 
       - name: Prepare for cache
         run: |
@@ -54,25 +71,27 @@ jobs:
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Install cpan deps 
+        shell: cmd
         run: |
+          path
           set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
           cpanm File::ShareDir::Install
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
           where pp_autolink.pl
-          #  no share install for Alien::MSYS
+          ::  no share install for Alien::MSYS
           cpanm --notest --verbose Alien::MSYS
           cpanm --notest Alien::libtiff  #  sys install for this one
-          #cpanm --notest Alien::patch
+          :: cpanm --notest Alien::patch
           cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          #  simpler gdal deps
+          ::  simpler gdal deps
           export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
           set ALIEN_INSTALL_TYPE=share 
           cpanm --notest -v Alien::gdal
-          # ALIEN_INSTALL_TYPE=share 
-          # cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
+          :: ALIEN_INSTALL_TYPE=share 
+          :: cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/first_upload/
@@ -91,11 +110,9 @@ jobs:
           cpanm --notest LWP::Simple
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
-          #otool -L `perl -MAlien::proj -E'print Alien::proj->dist_dir'`/lib/libproj.dylib
-          #otool -L `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm --reinstall --verbose Geo::GDAL::FFI || {
-            # echo "Geo::GDAL::FFI failed its tests" >&2
+            :: echo "Geo::GDAL::FFI failed its tests" >&2
             type $HOME/.cpanm/latest-build/build.log
             exit 0  #  don't cripple the caching by failing
           }
