@@ -87,20 +87,15 @@ jobs:
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
           where pp_autolink.pl
-          ::  no share install for Alien::MSYS
           cpanm --notest --verbose Alien::MSYS
-          cpanm --notest Alien::libtiff  #  sys install for this one
-          :: cpanm --notest Alien::patch
+          cpanm --notest Alien::libtiff
           cpanm --notest Alien::sqlite
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ::  simpler gdal deps
           export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
           set ALIEN_INSTALL_TYPE=share 
           cpanm --notest -v Alien::gdal
-          :: ALIEN_INSTALL_TYPE=share 
-          :: cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
-          cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
+          cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
           ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/first_upload/
           ppm install Cairo
           ppm install Cairo-GObject
@@ -118,12 +113,7 @@ jobs:
           cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
           cpanm --installdeps --notest Geo::GDAL::FFI
-          cpanm --reinstall --verbose Geo::GDAL::FFI || {
-            :: echo "Geo::GDAL::FFI failed its tests" >&2
-            echo $HOME/.cpanm/latest-build/build.log
-            exit 0  #  don't cripple the caching by failing
-          }
-          
+          cpanm Geo::GDAL::FFI
 
       - name: Clone biodiverse repo
         shell: cmd
