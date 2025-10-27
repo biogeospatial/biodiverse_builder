@@ -78,7 +78,7 @@ jobs:
           path
           perl -V > perlversion.txt
           ::  change the checksum so we refresh the cache
-          echo 'xxxx' >> perlversion.txt
+          echo '20251028' >> perlversion.txt
           
       - name: Cache CPAN modules
         uses: actions/cache@v4
@@ -180,6 +180,7 @@ jobs:
         with:
           name: cpanm_dir
           path: ${{ env.PERL_CPANM_HOME }}
+          include-hidden-files: true
           
       # - name: Build exe
         # shell: cmd
