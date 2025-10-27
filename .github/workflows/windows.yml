@@ -79,21 +79,23 @@ jobs:
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Install cpan deps 
-        shell: cmd
+        shell: pwsh
         run: |
-          set PATH=%SP_PATHS%;%PATH%
-          path
-          set PERL_CPANM_HOME=/Users/runners/.cpanm
+          # set PATH=%SP_PATHS%;%PATH%
+          # path
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          echo $env:PATH
+          # set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
           where pp_autolink.pl
-          cpanm --notest --verbose Alien::MSYS
+          cpanm --notest Alien::MSYS
           cpanm --notest Alien::libtiff
           cpanm --notest Alien::sqlite
           cpanm --notest --installdeps Alien::gdal
-          set ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
-          set ALIEN_INSTALL_TYPE=share 
+          $env:ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          $env:ALIEN_INSTALL_TYPE=share 
           cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
