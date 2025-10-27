@@ -89,12 +89,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
             
-      - name: One cpan module
-        shell: pwsh
-        run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          cpanm --notest --reinstall --verbose Browser::Start
-          ls \Users\runner\perl5
+      # - name: One cpan module
+        # shell: pwsh
+        # run: |
+          # $env:PATH = "$env:SP_PATHS;$env:PATH"
+          # cpanm --notest --reinstall --verbose Browser::Start
+          # ls \Users\runner\perl5
 
       - name: Install cpan deps 
         shell: pwsh
@@ -127,7 +127,7 @@ jobs:
           ppm install Cairo-GObject
           ppm install Glib
           ppm install Gnome2-Canvas
-          ppm install Gtk2
+          ppm install Gtk3
           ppm install Pango
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
