@@ -186,7 +186,8 @@ jobs:
       - name: Build exe
         shell: cmd
         run: |
-          set PATH=%SP_PATHS%;%PATH%
+          dir \Users\runner\perl5\bin
+          set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
         
