@@ -122,7 +122,7 @@ jobs:
           cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
-          ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/first_upload/
+          ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/Gtk3_20250624/
           ppm install Cairo
           ppm install Cairo-GObject
           ppm install Glib
