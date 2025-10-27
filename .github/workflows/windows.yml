@@ -53,7 +53,9 @@ jobs:
           echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> "$GITHUB_PATH"
 
       - name: perl -V
+        shell: cmd
         run: |
+          path
           perl -V
 
       - name: Prepare for cache
@@ -77,7 +79,7 @@ jobs:
       - name: Install cpan deps 
         shell: cmd
         run: |
-          %ST%\perl\portableshell.bat /SETENV
+          %ST%\portableshell.bat /SETENV
           path
           set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
@@ -126,7 +128,7 @@ jobs:
       - name: Clone biodiverse repo
         shell: cmd
         run: |
-          %ST%\perl\portableshell.bat /SETENV
+          %ST%\portableshell.bat /SETENV
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
@@ -144,7 +146,7 @@ jobs:
       - name: Build exe
         shell: cmd
         run: |
-          %ST%\perl\portableshell.bat /SETENV
+          %ST%\portableshell.bat /SETENV
           perl etc\pp\build_autolink -s bin\BiodiverseGUI.pl -o . 
         
       - name: Upload artefact
