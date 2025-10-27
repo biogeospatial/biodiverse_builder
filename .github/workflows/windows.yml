@@ -187,7 +187,8 @@ jobs:
         shell: cmd
         run: |
           set PATH=%SP_PATHS%;%PATH%
-          perl biodiverse\etc\pp\build_autolink -s bin\BiodiverseGUI.pl -o . 
+          cd biodiverse
+          perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
         
       - name: Upload artefact
         uses: actions/upload-artifact@v4
