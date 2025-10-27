@@ -81,6 +81,7 @@ jobs:
       - name: Install cpan deps 
         shell: pwsh
         run: |
+          $env:CMAKE_BUILD_PARALLEL_LEVEL=4
           # set PATH=%SP_PATHS%;%PATH%
           # path
           $env:PATH = "$env:SP_PATHS;$env:PATH"
@@ -152,5 +153,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows_exe
-          path: ./biodiverseGUI*.exe
+          path: ./BiodiverseGUI*.exe
 
