@@ -85,15 +85,14 @@ jobs:
           path
           set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
-          cpanm File::ShareDir::Install
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
           where pp_autolink.pl
           cpanm --notest --verbose Alien::MSYS
           cpanm --notest Alien::libtiff
           cpanm --notest Alien::sqlite
-          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          cpanm --notest --installdeps Alien::gdal
+          set ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
           set ALIEN_INSTALL_TYPE=share 
           cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
