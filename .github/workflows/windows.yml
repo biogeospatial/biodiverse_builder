@@ -14,7 +14,7 @@ env:
   PERL_MB_OPT: --install_base /Users/runner/perl5
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
-  PERL_CPANM_HOME: /Users/runners/.cpanm
+  PERL_CPANM_HOME: /Users/runner/.cpanm
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
   SP_PATHS: C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
@@ -86,7 +86,7 @@ jobs:
           # path
           $env:PATH = "$env:SP_PATHS;$env:PATH"
           echo $env:PATH
-          # set PERL_CPANM_HOME=/Users/runners/.cpanm
+          # set PERL_CPANM_HOME=/Users/runner/.cpanm
           perl -E'say $^V'
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
@@ -131,7 +131,7 @@ jobs:
           perl -E'say $^V'
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
-          cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
+          cpanm --installdeps .
           :: prove t/00-load.t || true  #  allow caching even if we fail
           prove -j4 -l t
           cd ..
@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
-          path: /Users/runners/.cpanm
+          path: /Users/runner/.cpanm
           
       - name: Build exe
         shell: cmd
