@@ -152,13 +152,16 @@ jobs:
           #prove -j4 -l t
           cd -
         
+      #  Does nothing at the moment as hidden file are not uploaded.
+      #  When they are, the archive contains invalid filenames.  
+      #  e.g. blib/man3/App::cpanminus.3
       - name: Upload cpanm dir
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
           path: ~/.cpanm
-          include-hidden-files: true
+          # include-hidden-files: true
           
           
       - name: GDAL probe 1
