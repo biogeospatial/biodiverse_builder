@@ -86,7 +86,7 @@ jobs:
           $env:PATH = "$env:SP_PATHS;$env:PATH"
           echo $env:PATH
           # set PERL_CPANM_HOME=/Users/runners/.cpanm
-          perl -v
+          perl -E'say $^V'
           cpanm --notest PAR::Packer
           cpanm App::PP::Autolink
           where pp_autolink.pl
@@ -94,8 +94,8 @@ jobs:
           cpanm --notest Alien::libtiff
           cpanm --notest Alien::sqlite
           cpanm --notest --installdeps Alien::gdal
-          $env:ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
-          $env:ALIEN_INSTALL_TYPE=share 
+          $env:ALIEN_GDAL_CMAKE_ARGS = "-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          $env:ALIEN_INSTALL_TYPE = "share"
           cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           cpanm https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
@@ -119,9 +119,11 @@ jobs:
           cpanm Geo::GDAL::FFI
 
       - name: Clone biodiverse repo
-        shell: cmd
+        shell: pwsh
         run: |
-          set PATH=%SP_PATHS%;%PATH%
+          # set PATH=%SP_PATHS%;%PATH%
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          perl -E'say $^V'
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
