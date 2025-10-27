@@ -17,6 +17,7 @@ env:
   PERL_CPANM_HOME: /Users/runners/.cpanm
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
+  SP_PATHS: C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
 
 jobs:
   perl:
@@ -50,18 +51,19 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53841_64bit/strawberry-perl-5.38.4.1-64bit-PDL.zip" -OutFile ".\sp.zip" 
           Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
           ls "$env:ST"
-          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> "$GITHUB_PATH"
+          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
 
       - name: perl -V
         shell: cmd
         run: |
+          set PATH=%SP_PATHS%;%PATH%
           path
           perl -V
 
       - name: Prepare for cache
         shell: cmd
         run: |
-          %ST%\portableshell.bat /SETENV
+          set PATH=%SP_PATHS%;%PATH%
           path
           perl -V > perlversion.txt
           ::  change the checksum so we refresh the cache
@@ -79,7 +81,7 @@ jobs:
       - name: Install cpan deps 
         shell: cmd
         run: |
-          %ST%\portableshell.bat /SETENV
+          set PATH=%SP_PATHS%;%PATH%
           path
           set PERL_CPANM_HOME=/Users/runners/.cpanm
           perl -v
@@ -118,7 +120,7 @@ jobs:
       - name: Clone biodiverse repo
         shell: cmd
         run: |
-          %ST%\portableshell.bat /SETENV
+          set PATH=%SP_PATHS%;%PATH%
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || type $HOME/.cpanm/latest-build/build.log
@@ -136,7 +138,7 @@ jobs:
       - name: Build exe
         shell: cmd
         run: |
-          %ST%\portableshell.bat /SETENV
+          set PATH=%SP_PATHS%;%PATH%
           perl etc\pp\build_autolink -s bin\BiodiverseGUI.pl -o . 
         
       - name: Upload artefact
