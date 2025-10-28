@@ -180,14 +180,14 @@ jobs:
         shell: pwsh
         run: |
           $env:PATH = "$env:SP_PATHS;$env:PATH"
-          cpanm App::PP::Autolink~2.13
-          # perl -E'say $^V'
-          # git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
-          # cd perl-pp-autolink
-          # perl Makefile.PL
-          # gmake test 
-          # gmake install
-          # cd ..
+          #cpanm App::PP::Autolink~2.13
+          perl -E'say $^V'
+          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
+          cd perl-pp-autolink
+          perl Makefile.PL
+          gmake test 
+          gmake install
+          cd ..
           where pp_autolink.pl
 
 
@@ -215,7 +215,7 @@ jobs:
           include-hidden-files: true
 
       - name: Upload perl5 dir
-        if: success() || failure()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: perl5_dir_win
@@ -234,11 +234,12 @@ jobs:
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
           cd ..
           dir
-          
+        
+        #  need to work out which type is most appropriate
       - uses: actions/attest@v2
         with:
           subject-path: ./Biodiverse*.exe
-          #predicate-type: 'https://example.com/predicate/v1'
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
       - name: Upload artefact
