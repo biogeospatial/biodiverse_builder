@@ -236,7 +236,7 @@ jobs:
           
       - uses: actions/attest@v2
         with:
-          subject-path: '${{ github.workspace }}/BiodiverseGUI.exe'
+          subject-path: ./Biodiverse*.exe
           #predicate-type: 'https://example.com/predicate/v1'
           predicate: '{}'
         
