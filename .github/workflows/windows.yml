@@ -96,17 +96,6 @@ jobs:
           # cpanm --notest --reinstall --verbose Browser::Start
           # ls \Users\runner\perl5
 
-      - name: Alien::GtkStack
-        shell: pwsh
-        run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          git clone --depth=1 https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
-          cd perl-alien-gtkstack-windows
-          perl Makefile.PL
-          gmake test 
-          gmake install
-          cd ..
-
       - name: Install cpan deps 
         shell: pwsh
         run: |
@@ -132,14 +121,6 @@ jobs:
           $env:ALIEN_INSTALL_TYPE = "share"
           cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
-          # cpanm -v https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
-          ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/Gtk3_20250624/
-          ppm install Cairo
-          ppm install Cairo-GObject
-          ppm install Glib
-          ppm install Glib-Object-Introspection
-          ppm install Gtk3
-          ppm install Pango
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
           cpanm --notest Browser::Start
@@ -153,7 +134,26 @@ jobs:
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm Geo::GDAL::FFI
 
-      - name: Clone biodiverse repo
+      - name: Alien::GtkStack and PPMS
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          git clone --depth=1 https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
+          cd perl-alien-gtkstack-windows
+          perl Makefile.PL
+          cpanm --installdeps --notest .
+          gmake test 
+          gmake install
+          cd ..
+          ppm set repository biodiverse https://github.com/shawnlaffan/perl-alien-gtkstack-windows/releases/download/Gtk3_20250624/
+          ppm install Cairo
+          ppm install Cairo-GObject
+          ppm install Glib
+          ppm install Glib-Object-Introspection
+          ppm install Gtk3
+          ppm install Pango
+
+          - name: Clone biodiverse repo
         shell: pwsh
         run: |
           # set PATH=%SP_PATHS%;%PATH%
