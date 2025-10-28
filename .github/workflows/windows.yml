@@ -152,7 +152,6 @@ jobs:
           ppm install Gtk3
           ppm install Pango
 
-
       - name: PAR::Packer with Biodiverse icon
         shell: pwsh
         run: |
@@ -165,7 +164,7 @@ jobs:
           Invoke-WebRequest -Uri $env:URL -OutFile $env:PP_GZ
           tar -xzf $env:PP_GZ
           cd $env:PAR_PACKER
-          Copy-Item -Path "..\biodiverse\bin\Biodiverse_icon.ico" -Destination .\myldr\winres\pp.ico
+          Copy-Item -Path "..\Biodiverse_icon.ico" -Destination .\myldr\winres\pp.ico
           cpanm --installdeps .
           perl Makefile.PL
           gmake install
@@ -185,6 +184,7 @@ jobs:
           cd ..
           where pp_autolink.pl
 
+
       - name: Clone biodiverse repo
         shell: pwsh
         run: |
@@ -197,7 +197,6 @@ jobs:
           # prove t/00-load.t || true  #  allow caching even if we fail
           prove -j4 -l t
           cd ..
-
           
       
       
