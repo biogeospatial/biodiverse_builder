@@ -152,18 +152,25 @@ jobs:
           ppm install Gtk3
           ppm install Pango
 
-      - name: Clone biodiverse repo
+
+      - name: PAR::Packer with Biodiverse icon
         shell: pwsh
         run: |
-          # set PATH=%SP_PATHS%;%PATH%
           $env:PATH = "$env:SP_PATHS;$env:PATH"
+          $env:PAR_PACKER = "PAR-Packer-1.064"
+          $env:PP_GZ = "$env:PAR_PACKER.tar.gz"
+          $env:URL = "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/$env:PP_GZ"
+          echo $env:PATH
           perl -E'say $^V'
-          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
-          cd biodiverse
+          Invoke-WebRequest -Uri $env:URL -OutFile $env:PP_GZ
+          tar -xzf $env:PP_GZ
+          cd $env:PAR_PACKER
+          Copy-Item -Path "..\biodiverse\bin\Biodiverse_icon.ico" -Destination .\myldr\winres\pp.ico
           cpanm --installdeps .
-          # prove t/00-load.t || true  #  allow caching even if we fail
-          prove -j4 -l t
+          perl Makefile.PL
+          gmake install
           cd ..
+
 
       - name: pp-autolink from branch
         shell: pwsh
@@ -178,25 +185,20 @@ jobs:
           cd ..
           where pp_autolink.pl
 
+      - name: Clone biodiverse repo
+        shell: pwsh
+        run: |
+          # set PATH=%SP_PATHS%;%PATH%
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          perl -E'say $^V'
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps .
+          # prove t/00-load.t || true  #  allow caching even if we fail
+          prove -j4 -l t
+          cd ..
+
           
-      #  uncomment when the rest of the process works
-      # - name: PAR::Packer with Biodiverse icon
-        # shell: pwsh
-        # run: |
-          # $env:PATH = "$env:SP_PATHS;$env:PATH"
-          # $env:PAR_PACKER = "PAR-Packer-1.064"
-          # $env:PP_GZ = "$env:PAR_PACKER.tar.gz"
-          # $env:URL = "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/$env:PP_GZ"
-          # echo $env:PATH
-          # perl -E'say $^V'
-          # Invoke-WebRequest -Uri $env:URL -OutFile $env:PP_GZ
-          # tar -xzf $env:PP_GZ
-          # cd $env:PAR_PACKER
-          # Copy-Item -Path "..\biodiverse\bin\Biodiverse_icon.ico" -Destination .\myldr\winres\pp.ico
-          # cpanm --installdeps .
-          # perl Makefile.PL
-          # gmake install
-          # cd ..
       
       
       - name: Upload cpanm dir
