@@ -23,6 +23,11 @@ jobs:
   perl:
 
     runs-on: windows-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -228,6 +233,12 @@ jobs:
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
           cd ..
           dir
+          
+      - uses: actions/attest@v2
+        with:
+          subject-path: '${{ github.workspace }}/BiodiverseGUI.exe'
+          #predicate-type: 'https://example.com/predicate/v1'
+          predicate: '{}'
         
       - name: Upload artefact
         uses: actions/upload-artifact@v4
