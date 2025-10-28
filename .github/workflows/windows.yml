@@ -199,6 +199,8 @@ jobs:
         run: |
           :: set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
           set PATH=%SP_PATHS%;%PATH%
+          $env:BD_NO_GUI_DEV_WARN=1
+          $env:BDV_PP_BUILDING=1
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
           cd ..
