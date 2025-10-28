@@ -176,7 +176,7 @@ jobs:
         run: |
           $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
-          git clone --branch inc_search --single-branch https://github.com/shawnlaffan/perl-pp-autolink.git
+          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
           cd perl-pp-autolink
           perl Makefile.PL
           gmake test 
