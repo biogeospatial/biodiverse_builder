@@ -204,12 +204,13 @@ jobs:
 
           
       - name: Build exe
-        shell: cmd
+        shell: pwsh
         run: |
           :: set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
           set PATH=%SP_PATHS%;%PATH%
           $env:BD_NO_GUI_DEV_WARN=1
           $env:BDV_PP_BUILDING=1
+          $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
           cd ..
