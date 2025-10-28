@@ -153,7 +153,7 @@ jobs:
           ppm install Gtk3
           ppm install Pango
 
-          - name: Clone biodiverse repo
+      - name: Clone biodiverse repo
         shell: pwsh
         run: |
           # set PATH=%SP_PATHS%;%PATH%
