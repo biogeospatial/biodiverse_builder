@@ -107,8 +107,7 @@ jobs:
           # set PERL_CPANM_HOME=/Users/runner/.cpanm
           perl -E'say $^V'
           cpanm --notest PAR::Packer
-          cpanm App::PP::Autolink
-          where pp_autolink.pl
+          #cpanm App::PP::Autolink
           cpanm --notest Alien::MSYS
           cpanm --notest Alien::libtiff
           cpanm --notest Alien::sqlite
@@ -165,6 +164,20 @@ jobs:
           # prove t/00-load.t || true  #  allow caching even if we fail
           prove -j4 -l t
           cd ..
+
+      - name: pp-autolink from branch
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          perl -E'say $^V'
+          git clone --branch inc_search --single-branch https://github.com/shawnlaffan/perl-pp-autolink.git
+          cd perl-pp-autolink
+          perl Makefile.PL
+          gmake test 
+          gmake install
+          cd ..
+          where pp_autolink.pl
+
           
       #  uncomment when the rest of the process works
       # - name: PAR::Packer with Biodiverse icon
@@ -206,8 +219,7 @@ jobs:
       - name: Build exe
         shell: pwsh
         run: |
-          :: set PATH=\Users\runner\perl5\bin;%SP_PATHS%;%PATH%
-          set PATH=%SP_PATHS%;%PATH%
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
           $env:BD_NO_GUI_DEV_WARN=1
           $env:BDV_PP_BUILDING=1
           $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
