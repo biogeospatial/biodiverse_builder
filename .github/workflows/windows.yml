@@ -176,17 +176,18 @@ jobs:
           cd ..
 
 
-      - name: pp-autolink from branch
+      - name: pp-autolink
         shell: pwsh
         run: |
           $env:PATH = "$env:SP_PATHS;$env:PATH"
-          perl -E'say $^V'
-          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
-          cd perl-pp-autolink
-          perl Makefile.PL
-          gmake test 
-          gmake install
-          cd ..
+          cpanm App::PP::Autolink~2.13
+          # perl -E'say $^V'
+          # git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
+          # cd perl-pp-autolink
+          # perl Makefile.PL
+          # gmake test 
+          # gmake install
+          # cd ..
           where pp_autolink.pl
 
 
