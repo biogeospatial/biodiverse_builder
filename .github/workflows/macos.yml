@@ -100,7 +100,7 @@ jobs:
           eval "$(brew shellenv)"
           #cpanm Getopt::Long
           #cpanm App::PP::Autolink
-          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
+          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git
           which pp_autolink.pl
           which -a pp
           #  no share install for Alien::MSYS
