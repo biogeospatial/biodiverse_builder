@@ -23,6 +23,11 @@ jobs:
         os: [macOS-15-intel, macOS-15]
 
     runs-on: ${{ matrix.os }}
+    
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -193,6 +198,13 @@ jobs:
           echo Packing sqlite from ${sqlite_dylib}
           perl bin/mmb4.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
       
+      #  need to work out which type is most appropriate
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+
       
       - name: Pack the contents into the dmg
         run: |
