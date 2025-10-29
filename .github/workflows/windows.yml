@@ -200,8 +200,8 @@ jobs:
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
-          # prove t/00-load.t || true  #  allow caching even if we fail
-          prove -j4 -l t
+          prove t/00-load.t
+          #prove -j4 -l t
           cd ..
           
       
