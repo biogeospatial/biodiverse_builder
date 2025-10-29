@@ -214,6 +214,15 @@ jobs:
         run: |
           export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
           echo ${DMG_FILE_NAME}
+          echo "DMG_FILE_NAME=${DMG_FILE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse*.dmg
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+
+
           
         
       - name: Upload artefact
