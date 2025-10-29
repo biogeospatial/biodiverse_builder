@@ -232,6 +232,7 @@ jobs:
           $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
           cd biodiverse
           perl etc\pp\build_autolink.pl -s bin\BiodiverseGUI.pl -o ..
+          cp data -Destination ../data -Recurse
           cd ..
           dir
           
@@ -255,5 +256,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
-          path: ./Biodiverse*.exe
+          path: |
+            ./Biodiverse*.exe
+            data
 
