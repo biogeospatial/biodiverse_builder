@@ -95,6 +95,7 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          export CMAKE_BUILD_PARALLEL_LEVEL=3
           #  ensure share install when needed
           eval "$(brew shellenv)"
           #cpanm Getopt::Long
@@ -151,12 +152,16 @@ jobs:
           #prove -j4 -l t
           cd -
         
+      #  Does nothing at the moment as hidden file are not uploaded.
+      #  When they are, the archive contains invalid filenames.  
+      #  e.g. blib/man3/App::cpanminus.3
       - name: Upload cpanm dir
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
           path: ~/.cpanm
+          # include-hidden-files: true
           
           
       - name: GDAL probe 1
