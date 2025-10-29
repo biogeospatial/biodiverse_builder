@@ -183,7 +183,7 @@ jobs:
           hdiutil resize -size 100MB ./images/Biodiverse.dmg
           df -h
       
-      - name: Run mmb3.pl
+      - name: Run mmb4.pl
         run: |
           eval "$(brew shellenv)"
           export PATH=/Users/runner/perl5/bin:$PATH
@@ -191,7 +191,12 @@ jobs:
           echo $SHELL
           export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
           echo Packing sqlite from ${sqlite_dylib}
-          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
+          perl bin/mmb4.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
+      
+      
+      - name: Pack the contents into the dmg
+        run: |
+          perl bin/builddmg.pl
         
       - name: Find dmg file
         run: |
