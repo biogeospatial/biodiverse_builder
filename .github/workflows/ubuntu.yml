@@ -180,6 +180,7 @@ jobs:
           #export DISPLAY=:0.0
           export DISPLAY=:99
           perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
+          cp -R biodiverse/data ./data
 
       #  need to work out which type is most appropriate
       - uses: actions/attest@v2
@@ -199,7 +200,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
-          path: ./BiodiverseGUI*
+          path: |
+            ./${{ steps.binary_name.outputs.BINARY_NAME }}
+            data
 
       # - name: Uninstall gdal deps
         # run: |
