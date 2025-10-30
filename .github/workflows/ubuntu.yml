@@ -69,7 +69,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo '20251031' >> perlversion.txt
+          echo '20251031 ALIEN_INSTALL_TYPE=share' >> perlversion.txt
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
@@ -100,15 +100,15 @@ jobs:
           cpanm --notest FFI::Platypus
           cpanm --notest Alien::Build  
           cpanm --installdeps --notest Alien::sqlite
-          cpanm -v Alien::sqlite
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::sqlite
           cpanm --installdeps --notest Alien::libtiff
-          cpanm -v Alien::libtiff
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::libtiff
           cpanm --installdeps --notest Alien::geos::af
-          cpanm -v Alien::geos::af
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::geos::af
           cpanm --installdeps --notest Alien::proj
-          cpanm -v Alien::proj
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::proj
           cpanm --installdeps --notest Alien::gdal
-          cpanm -v Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::gdal
           cpanm --notest --installdeps --no-man-pages PDL
           cpanm --notest --no-man-pages PDL
           cpanm --installdeps --notest Geo::GDAL::FFI
