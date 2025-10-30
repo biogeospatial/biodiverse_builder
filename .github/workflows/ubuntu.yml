@@ -191,7 +191,7 @@ jobs:
       - name: Find binary file
         id: binary_name
         run: |
-          export BINARY_NAME=`find ./builds -name BiodiverseGUI* -exec basename {} \;`
+          export BINARY_NAME=`find . -maxdepth 1 -name BiodiverseGUI* -exec basename {} \;`
           echo ${BINARY_NAME}
           echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
 
