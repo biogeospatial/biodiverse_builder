@@ -89,6 +89,12 @@ jobs:
           eval "$(perl -Mlocal::lib=${HOME}/perl5)"
           # eval $(perl -I ${PERL_MOD_DIR}/lib/perl5/ -Mlocal::lib)
           # https://github.com/libwww-perl/libwww-perl/issues/491
+          cpanm --notest Browser::Start 
+          cpanm --notest ExtUtils::Depends 
+          cpanm --notest ExtUtils::PkgConfig
+          cpanm --notest HTTP::Tiny
+          cpanm IO::Socket::SSL
+          cpanm LWP::Simple
           cpanm --notest LWP
           cpanm --installdeps FFI::Platypus
           cpanm --notest FFI::Platypus
