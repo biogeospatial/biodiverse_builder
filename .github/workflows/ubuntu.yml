@@ -56,14 +56,6 @@ jobs:
         run: |
           sudo apt-get --yes install cmake
 
-      - name: Locale check
-        run: |
-          locale -a
-          #sudo locale-gen de_DE.iso88591
-          #sudo update-locale de_DE.iso88591
-          sudo locale-gen de_DE
-          sudo update-locale de_DE
-
       - name: Locale check 2
         run: |
           locale -a
