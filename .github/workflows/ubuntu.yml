@@ -159,13 +159,13 @@ jobs:
           # }
 
 
-      # - name: Run builder
-        # run: |
-          # echo $(perl -Mlocal::lib=${HOME}/perl5)
-          # eval "$(perl -Mlocal::lib=${HOME}/perl5)"
-          # which -a pp
-          # echo $SHELL
-          # perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
+      - name: Run builder
+        run: |
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          which -a pp_autolink
+          echo $SHELL
+          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
 
       # #  need to work out which type is most appropriate
       # - uses: actions/attest@v2
