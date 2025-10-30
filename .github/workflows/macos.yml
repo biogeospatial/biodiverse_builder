@@ -23,6 +23,11 @@ jobs:
         os: [macOS-15-intel, macOS-15]
 
     runs-on: ${{ matrix.os }}
+    
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +105,7 @@ jobs:
           eval "$(brew shellenv)"
           #cpanm Getopt::Long
           #cpanm App::PP::Autolink
-          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@mac_intel_debug
+          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git
           which pp_autolink.pl
           which -a pp
           #  no share install for Alien::MSYS
@@ -156,7 +161,7 @@ jobs:
       #  When they are, the archive contains invalid filenames.  
       #  e.g. blib/man3/App::cpanminus.3
       - name: Upload cpanm dir
-        if: success() || failure()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
@@ -183,7 +188,7 @@ jobs:
           hdiutil resize -size 100MB ./images/Biodiverse.dmg
           df -h
       
-      - name: Run mmb3.pl
+      - name: Run mmb4.pl
         run: |
           eval "$(brew shellenv)"
           export PATH=/Users/runner/perl5/bin:$PATH
@@ -191,18 +196,38 @@ jobs:
           echo $SHELL
           export sqlite_dylib=`perl -MAlien::sqlite -E'print Alien::sqlite->dist_dir'`/lib/libsqlite3.0.dylib
           echo Packing sqlite from ${sqlite_dylib}
-          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
+          perl bin/mmb4.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
+      
+      #  need to work out which type is most appropriate
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+
+      
+      - name: Pack the contents into the dmg
+        run: |
+          perl bin/builddmg.pl
         
       - name: Find dmg file
+        id: dmg_file_name
         run: |
-          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
+          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
           echo ${DMG_FILE_NAME}
+          echo "DMG_FILE_NAME=${DMG_FILE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse*.dmg
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
           
         
       - name: Upload artefact
         uses: actions/upload-artifact@v4
         with:
-          name: dmg-file-${{ matrix.os }}
+          name: ${{ steps.dmg_file_name.outputs.DMG_FILE_NAME }}-${{ matrix.os }}
           path: ./builds/Biodiverse-*.dmg
 
       - name: Uninstall brew deps
@@ -230,6 +255,7 @@ jobs:
           }
 
       - name: Upload gdal probe
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: gdal_probe-${{ matrix.os }}

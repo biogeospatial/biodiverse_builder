@@ -12,6 +12,7 @@ use File::Spec::Functions;
 use Path::Tiny;
 use FindBin;
 #use lib "$FindBin::Bin/../../../lib";
+use rlib '../biodiverse/lib';  #  clunky
 use Biodiverse::Config;
 
 local $| = 1;
