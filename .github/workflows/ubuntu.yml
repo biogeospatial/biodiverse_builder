@@ -181,32 +181,25 @@ jobs:
           export DISPLAY=:99
           perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
 
-      # #  need to work out which type is most appropriate
-      # - uses: actions/attest@v2
-        # with:
-          # subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          # predicate-type: 'https://slsa.dev/provenance/v0.2'
-          # predicate: '{}'
+      #  need to work out which type is most appropriate
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./BiodiverseGUI*
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
 
-      # - name: Find binary file
-        # id: binary_name
-        # run: |
-          # export BINARY_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
-          # echo ${BINARY_NAME}
-          # echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
+      - name: Find binary file
+        id: binary_name
+        run: |
+          export BINARY_NAME=`find ./builds -name BiodiverseGUI* -exec basename {} \;`
+          echo ${BINARY_NAME}
+          echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
 
-      # - uses: actions/attest@v2
-        # with:
-          # subject-path: ./builds/Biodiverse*.dmg
-          # predicate-type: 'https://slsa.dev/provenance/v0.2'
-          # predicate: '{}'
-          
-        
-      # - name: Upload artefact
-        # uses: actions/upload-artifact@v4
-        # with:
-          # name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
-          # path: ./builds/BiodiverseGUI*
+      - name: Upload artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
+          path: ./BiodiverseGUI*
 
       # - name: Uninstall gdal deps
         # run: |
