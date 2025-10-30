@@ -163,6 +163,7 @@ jobs:
         run: |
           echo $(perl -Mlocal::lib=${HOME}/perl5)
           eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          cpanm App::PP::Autolink
           which -a pp_autolink
           echo $SHELL
           perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
