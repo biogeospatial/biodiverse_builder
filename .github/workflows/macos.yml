@@ -161,7 +161,7 @@ jobs:
       #  When they are, the archive contains invalid filenames.  
       #  e.g. blib/man3/App::cpanminus.3
       - name: Upload cpanm dir
-        if: success() || failure()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cpanm_dir
@@ -211,8 +211,9 @@ jobs:
           perl bin/builddmg.pl
         
       - name: Find dmg file
+        id: dmg_file_name
         run: |
-          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
+          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
           echo ${DMG_FILE_NAME}
           echo "DMG_FILE_NAME=${DMG_FILE_NAME}" >> "$GITHUB_OUTPUT"
 
@@ -221,14 +222,12 @@ jobs:
           subject-path: ./builds/Biodiverse*.dmg
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
-
-
           
         
       - name: Upload artefact
         uses: actions/upload-artifact@v4
         with:
-          name: dmg-file-${{ matrix.os }}
+          name: ${{ steps.dmg_file_name.outputs.DMG_FILE_NAME }}-${{ matrix.os }}
           path: ./builds/Biodiverse-*.dmg
 
       - name: Uninstall brew deps
@@ -256,6 +255,7 @@ jobs:
           }
 
       - name: Upload gdal probe
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: gdal_probe-${{ matrix.os }}
