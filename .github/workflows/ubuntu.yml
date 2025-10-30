@@ -69,7 +69,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo '20251031 ALIEN_INSTALL_TYPE=share' >> perlversion.txt
+          echo '20251031 ALIEN_INSTALL_TYPE=share, less gdal' >> perlversion.txt
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
