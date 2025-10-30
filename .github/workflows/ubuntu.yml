@@ -1,0 +1,236 @@
+name: ubuntu
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /Users/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
+  PERL_MB_OPT: --install_base /Users/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+  PERL_CPANM_OPT: -M https://www.cpan.org
+  PERL_MOD_DIR: /home/runner/perl5/lib/perl5
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+
+jobs:
+  perl:
+
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe wd
+        run: |
+          pwd
+          ls -l
+          
+      - name: uname
+        run: |
+          uname -m   
+          
+
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.36'
+
+      - name: update apt get
+        run: |
+          sudo apt-get update
+
+      - name: gdal stack
+        run: |
+          sudo apt-get --yes install libgdal-dev
+
+      - name: cmake
+        run: |
+          sudo apt-get --yes install cmake
+
+      - name: Locale check
+        run: |
+          locale -a
+          #sudo locale-gen de_DE.iso88591
+          #sudo update-locale de_DE.iso88591
+          sudo locale-gen de_DE
+          sudo update-locale de_DE
+
+      - name: Locale check 2
+        run: |
+          locale -a
+          echo Current locale:
+          locale
+
+      - name: perl -V
+        run: perl -V
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          echo '20221210' >> perlversion.txt
+          ls -l perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v4
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install Dynamic Dependencies
+        run: |
+          which -a cpanm
+          which -a perl
+          cpanm --notest local::lib
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          #eval $(perl -I ${PERL_MOD_DIR}/lib/perl5/ -Mlocal::lib)
+          # https://github.com/libwww-perl/libwww-perl/issues/491
+          cpanm --notest LWP
+          cpanm --installdeps FFI::Platypus
+          cpanm --notest FFI::Platypus
+          #cpanm --notest FFI::Platypus::Declare
+          cpanm --notest Alien::Build  
+          cpanm --installdeps --notest Alien::sqlite
+          cpanm -v Alien::sqlite
+          cpanm --installdeps --notest Alien::libtiff
+          cpanm -v Alien::libtiff
+          cpanm --installdeps --notest Alien::geos::af
+          cpanm -v Alien::geos::af
+          cpanm --installdeps --notest Alien::proj
+          cpanm -v Alien::proj
+          cpanm --installdeps --notest Alien::gdal
+          cpanm -v Alien::gdal
+          cpanm --notest --installdeps --no-man-pages PDL
+          cpanm --notest --no-man-pages PDL
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm --reinstall --verbose Geo::GDAL::FFI || {
+            echo "Geo::GDAL::FFI failed its tests" >&2
+            cat $HOME/.cpanm/latest-build/build.log
+            exit 0  #  don't cripple the caching by failing
+          }
+          
+      - name: Gtk stuff
+        run: |
+          sudo apt-get install libpango1.0-dev libgtk2.0-dev \
+            libgtk-3-dev libgirepository1.0-dev libgoocanvas-2.0-dev
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          cpanm --notest Pango
+          cpanm --notest Gtk3
+
+      # - name: GDAL dylibs
+        # run: |
+          # which perl
+          # ldd `perl -MAlien::gdal -E'print Alien::gdal->dist_dir'`/lib/libgdal.dylib
+          
+
+      - name: Clone biodiverse repo
+        run: | 
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
+          prove t/00-load.t || true  #  allow caching even if we fail
+          #prove -j4 -l t
+          cd -
+        
+      #  Does nothing at the moment as hidden file are not uploaded.
+      #  When they are, the archive contains invalid filenames.  
+      #  e.g. blib/man3/App::cpanminus.3
+      - name: Upload cpanm dir
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm_dir
+          path: ~/.cpanm
+          # include-hidden-files: true
+          
+          
+      # - name: GDAL probe 1
+        # run: |
+          # perl etc/probe_gdal.pl
+          # pp_autolink -o probe_gdal etc/probe_gdal.pl
+          # ./probe_gdal || {
+            # echo "Binary failed to run!" >&2
+            # exit 0  #  don't cripple the caching by failing
+          # }
+
+
+      - name: Run builder
+        run: |
+          which -a pp
+          echo $SHELL
+          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
+
+      #  need to work out which type is most appropriate
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+
+      - name: Find binary file
+        id: binary_name
+        run: |
+          export BINARY_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
+          echo ${BINARY_NAME}
+          echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/attest@v2
+        with:
+          subject-path: ./builds/Biodiverse*.dmg
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+          
+        
+      - name: Upload artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
+          path: ./builds/BiodiverseGUI*
+
+      # - name: Uninstall gdal deps
+        # run: |
+          # sudo apt uninstall libgdal-dev
+
+      # - name: Move ~/perl5 out of the way
+        # run: |
+          # [[ -d ~/perl5 ]] && mv ~/perl5 ~/perl5x
+          # ls ~
+
+      # - name: Try to run the packed archive
+        # run: |
+          # BDV_PP_BUILDING=1 BD_NO_GUI_DEV_WARN=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI || {
+            # echo "Binary failed to run!" >&2
+            # exit 0  #  don't cripple the caching by failing
+          # }
+          
+      # - name: GDAL probe 2
+        # run: |
+          # ./probe_gdal || {
+            # echo "Binary failed to run!" >&2
+            # exit 0  #  don't cripple the caching by failing
+          # }
+
+      # - name: Upload gdal probe
+        # if: failure()
+        # uses: actions/upload-artifact@v4
+        # with:
+          # name: gdal_probe-${{ matrix.os }}
+          # path: ./probe_gdal
+          
+      # - name: Reinstate ~/perl5 for caching
+        # if: "!cancelled()"
+        # run: |
+          # [[ -d ~/perl5x ]] && mv ~/perl5x ~/perl5
+          # ls ~
