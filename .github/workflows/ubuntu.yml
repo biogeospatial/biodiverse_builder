@@ -9,11 +9,11 @@ on:
   pull_request:
 
 env:
-  PERL5LIB: /home/runner/perl5/lib/perl5
-  PERL_LOCAL_LIB_ROOT: /home/runner/perl5
-  PERL_MB_OPT: --install_base /home/runner/perl5
-  PERL_MM_OPT: INSTALL_BASE=/home/runner/perl5
-  PERL_CPANM_OPT: -M https://www.cpan.org
+  # PERL5LIB: /home/runner/perl5/lib/perl5
+  # PERL_LOCAL_LIB_ROOT: /home/runner/perl5
+  # PERL_MB_OPT: --install_base /home/runner/perl5
+  # PERL_MM_OPT: INSTALL_BASE=/home/runner/perl5
+  # PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_MOD_DIR: /home/runner/perl5/lib/perl5
   CMAKE_BUILD_PARALLEL_LEVEL: 4
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: gdal stack
         run: |
-          sudo apt-get --yes install libgdal-dev
+          sudo apt-get --yes install libgdal-dev libffi-dev
 
       - name: cmake
         run: |
@@ -83,15 +83,14 @@ jobs:
         run: |
           which -a cpanm
           which -a perl
-          # cpanm --notest local::lib
-          # echo $(perl -Mlocal::lib=${HOME}/perl5)
-          # eval "$(perl -Mlocal::lib=${HOME}/perl5)"
-          #eval $(perl -I ${PERL_MOD_DIR}/lib/perl5/ -Mlocal::lib)
+          cpanm --notest local::lib
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          # eval $(perl -I ${PERL_MOD_DIR}/lib/perl5/ -Mlocal::lib)
           # https://github.com/libwww-perl/libwww-perl/issues/491
           cpanm --notest LWP
           cpanm --installdeps FFI::Platypus
           cpanm --notest FFI::Platypus
-          #cpanm --notest FFI::Platypus::Declare
           cpanm --notest Alien::Build  
           cpanm --installdeps --notest Alien::sqlite
           cpanm -v Alien::sqlite
