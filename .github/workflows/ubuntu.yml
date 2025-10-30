@@ -16,6 +16,7 @@ env:
   # PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_MOD_DIR: /home/runner/perl5/lib/perl5
   CMAKE_BUILD_PARALLEL_LEVEL: 4
+  MAKEFLAGS: -j4
 
 jobs:
   perl:
@@ -156,38 +157,38 @@ jobs:
           # }
 
 
-      - name: Run builder
-        run: |
-          which -a pp
-          echo $SHELL
-          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
+      # - name: Run builder
+        # run: |
+          # which -a pp
+          # echo $SHELL
+          # perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
 
-      #  need to work out which type is most appropriate
-      - uses: actions/attest@v2
-        with:
-          subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          predicate-type: 'https://slsa.dev/provenance/v0.2'
-          predicate: '{}'
+      # #  need to work out which type is most appropriate
+      # - uses: actions/attest@v2
+        # with:
+          # subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          # predicate-type: 'https://slsa.dev/provenance/v0.2'
+          # predicate: '{}'
 
-      - name: Find binary file
-        id: binary_name
-        run: |
-          export BINARY_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
-          echo ${BINARY_NAME}
-          echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
+      # - name: Find binary file
+        # id: binary_name
+        # run: |
+          # export BINARY_NAME=`find ./builds -name Biodiverse-*.dmg -exec basename {} \; | sed -e's/.dmg//'`
+          # echo ${BINARY_NAME}
+          # echo "BINARY_NAME=${BINARY_NAME}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/attest@v2
-        with:
-          subject-path: ./builds/Biodiverse*.dmg
-          predicate-type: 'https://slsa.dev/provenance/v0.2'
-          predicate: '{}'
+      # - uses: actions/attest@v2
+        # with:
+          # subject-path: ./builds/Biodiverse*.dmg
+          # predicate-type: 'https://slsa.dev/provenance/v0.2'
+          # predicate: '{}'
           
         
-      - name: Upload artefact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
-          path: ./builds/BiodiverseGUI*
+      # - name: Upload artefact
+        # uses: actions/upload-artifact@v4
+        # with:
+          # name: ${{ steps.binary_name.outputs.BINARY_NAME }}-ubuntu
+          # path: ./builds/BiodiverseGUI*
 
       # - name: Uninstall gdal deps
         # run: |
