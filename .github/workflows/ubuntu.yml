@@ -80,6 +80,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
+      - name: Install aliens
+        run: |
+          which -a cpanm
+          which -a perl
+          cpanm --notest local::lib
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          cpanm --notest Alien::Build  
+          cpanm --installdeps --notest Alien::sqlite
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::sqlite
+          cpanm --installdeps --notest Alien::libtiff
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::libtiff
+          #  cmake jobs don't like the global makeflags setting
+          #  but should be parallel anyway
+          export MAKEFLAGS=""
+          cpanm --installdeps --notest Alien::geos::af
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::geos::af
+          cpanm --installdeps --notest Alien::proj
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::proj
+          cpanm --installdeps --notest Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm -v Alien::gdal
+          cpanm --notest --installdeps --no-man-pages PDL
+
       - name: Install Dynamic Dependencies
         run: |
           which -a cpanm
@@ -98,17 +121,6 @@ jobs:
           cpanm --notest LWP
           cpanm --installdeps FFI::Platypus
           cpanm --notest FFI::Platypus
-          cpanm --notest Alien::Build  
-          cpanm --installdeps --notest Alien::sqlite
-          ALIEN_INSTALL_TYPE=share cpanm -v Alien::sqlite
-          cpanm --installdeps --notest Alien::libtiff
-          ALIEN_INSTALL_TYPE=share cpanm -v Alien::libtiff
-          cpanm --installdeps --notest Alien::geos::af
-          ALIEN_INSTALL_TYPE=share cpanm -v Alien::geos::af
-          cpanm --installdeps --notest Alien::proj
-          ALIEN_INSTALL_TYPE=share cpanm -v Alien::proj
-          cpanm --installdeps --notest Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm -v Alien::gdal
           cpanm --notest --installdeps --no-man-pages PDL
           cpanm --notest --no-man-pages PDL
           cpanm --installdeps --notest Geo::GDAL::FFI
@@ -117,6 +129,7 @@ jobs:
             cat $HOME/.cpanm/latest-build/build.log
             exit 0  #  don't cripple the caching by failing
           }
+
           
       - name: Gtk stuff
         run: |
