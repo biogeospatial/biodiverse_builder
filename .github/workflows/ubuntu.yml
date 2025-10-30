@@ -172,6 +172,7 @@ jobs:
           cpanm App::PP::Autolink
           which -a pp_autolink
           echo $SHELL
+          export DISPLAY=:0.0
           perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
 
       # #  need to work out which type is most appropriate
