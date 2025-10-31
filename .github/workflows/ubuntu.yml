@@ -72,7 +72,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo '20251031 ALIEN_INSTALL_TYPE=share, even less gdal' >> perlversion.txt
+          echo '20251031 ALIEN_INSTALL_TYPE=share, even more less gdal' >> perlversion.txt
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
@@ -103,7 +103,8 @@ jobs:
           cpanm --installdeps --notest Alien::proj
           ALIEN_INSTALL_TYPE=share cpanm -v Alien::proj
           cpanm --installdeps --notest Alien::gdal
-          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          #  no openssl as we don't use it and it does not find the version from shogo needed for Net::SSLeay
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF -DGDAL_USE_OPENSSL=OFF"
           ALIEN_INSTALL_TYPE=share cpanm -v Alien::gdal
           cpanm --notest --installdeps --no-man-pages PDL
 
