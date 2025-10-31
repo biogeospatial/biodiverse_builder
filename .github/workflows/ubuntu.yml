@@ -49,13 +49,13 @@ jobs:
         run: |
           sudo apt-get update
 
-      - name: gdal stack
-        run: |
-          sudo apt-get --yes install libgdal-dev libffi-dev
+      # - name: gdal stack
+        # run: |
+          # sudo apt-get --yes install libgdal-dev 
 
-      - name: cmake
+      - name: cmake and ffi
         run: |
-          sudo apt-get --yes install cmake
+          sudo apt-get --yes install cmake libffi-dev
 
       - name: Locale check 2
         run: |
@@ -69,7 +69,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo '20251031 ALIEN_INSTALL_TYPE=share, less gdal' >> perlversion.txt
+          echo '20251031 ALIEN_INSTALL_TYPE=share, even less gdal' >> perlversion.txt
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
