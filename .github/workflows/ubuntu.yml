@@ -58,6 +58,7 @@ jobs:
           sudo apt-get --yes install cmake libffi-dev openssl libssl-dev
           which -a openssl
           openssl version
+          ldd `which openssl`
 
       - name: Locale check 2
         run: |
@@ -110,6 +111,7 @@ jobs:
         run: |
           which -a cpanm
           which -a perl
+          which openssl
           cpanm --notest local::lib
           echo $(perl -Mlocal::lib=${HOME}/perl5)
           eval "$(perl -Mlocal::lib=${HOME}/perl5)"
@@ -119,8 +121,8 @@ jobs:
           cpanm --notest ExtUtils::Depends 
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest HTTP::Tiny
-          cpanm --reinstall Net::SSLeay
-          cpanm --reinstall IO::Socket::SSL
+          #cpanm --reinstall Net::SSLeay
+          #cpanm --reinstall IO::Socket::SSL
           cpanm LWP::Simple
           cpanm --notest LWP
           cpanm --installdeps FFI::Platypus
