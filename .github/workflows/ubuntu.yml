@@ -126,6 +126,7 @@ jobs:
           #cpanm --reinstall Net::SSLeay
           #cpanm --reinstall IO::Socket::SSL
           cpanm LWP::Simple
+          cpanm --notest Spreadsheet::Read
           cpanm --notest LWP
           cpanm --installdeps FFI::Platypus
           cpanm --notest FFI::Platypus
