@@ -73,7 +73,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo '20251031 ALIEN_INSTALL_TYPE=share, even more less gdal' >> perlversion.txt
+          echo '20251031 ALIEN_INSTALL_TYPE=share, even more less gdal and pg' >> perlversion.txt
           ls -l perlversion.txt
 
       - name: Cache CPAN modules
@@ -105,7 +105,7 @@ jobs:
           ALIEN_INSTALL_TYPE=share cpanm -v Alien::proj
           cpanm --installdeps --notest Alien::gdal
           #  no openssl as we don't use it and it does not find the version from shogo needed for Net::SSLeay
-          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF -DGDAL_USE_OPENSSL=OFF"
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF -DGDAL_USE_OPENSSL=OFF GDAL_USE_POSTGRESQL=OFF"
           ALIEN_INSTALL_TYPE=share cpanm -v Alien::gdal
           cpanm --notest --installdeps --no-man-pages PDL
 
@@ -202,9 +202,10 @@ jobs:
           #export DISPLAY=:0.0
           export DISPLAY=:99
           #  hard code some libs for now due to clashes
-          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl \
-            --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libssl.so.3 \
-            --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libcrypto.so.3
+          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl 
+          #\
+          # --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libssl.so.3 \
+          #  --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libcrypto.so.3
           cp -R biodiverse/data ./data
 
       #  need to work out which type is most appropriate
