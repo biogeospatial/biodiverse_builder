@@ -200,7 +200,10 @@ jobs:
           echo $SHELL
           #export DISPLAY=:0.0
           export DISPLAY=:99
-          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl
+          #  hard code some libs for now due to clashes
+          perl biodiverse/etc/pp/build_autolink.pl -s biodiverse/bin/BiodiverseGUI.pl \
+            --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libssl.so.3 \
+            --link /opt/hostedtoolcache/perl/5.42.0/x64/lib64/libcrypto.so.3
           cp -R biodiverse/data ./data
 
       #  need to work out which type is most appropriate
