@@ -59,6 +59,7 @@ jobs:
           which -a openssl
           openssl version
           ldd `which openssl`
+          ldd $(find /opt/hostedtoolcache/perl/5.42.0/ -name SSLeay.so)
 
       - name: Locale check 2
         run: |
