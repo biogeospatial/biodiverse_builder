@@ -195,7 +195,8 @@ jobs:
         run: |
           echo $(perl -Mlocal::lib=${HOME}/perl5)
           eval "$(perl -Mlocal::lib=${HOME}/perl5)"
-          cpanm App::PP::Autolink
+          #cpanm App::PP::Autolink
+          cpanm https://github.com/shawnlaffan/perl-pp-autolink.git@20251101
           which -a pp_autolink
           echo $SHELL
           #export DISPLAY=:0.0
