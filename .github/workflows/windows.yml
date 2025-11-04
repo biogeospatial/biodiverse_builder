@@ -199,6 +199,7 @@ jobs:
           perl -E'say $^V'
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
+          git checkout tags/r5.0
           cpanm --installdeps .
           prove t/00-load.t
           #prove -j4 -l t
